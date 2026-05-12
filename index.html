@@ -318,32 +318,6 @@ header {
     <span id="sync-status">⏳ מתחבר</span>
   </header>
 
-  <!-- Setup screen -->
-  <div id="setup-screen">
-    <div class="setup-card">
-      <h2>⚙️ הגדרות ראשוניות</h2>
-      <p>הכנס את פרטי ה-API פעם אחת — הם יישמרו בדפדפן שלך בלבד.</p>
-
-      <div class="setup-field">
-        <label>Anthropic API Key</label>
-        <input type="password" id="ant-key" placeholder="sk-ant-api03-..." />
-      </div>
-      <div class="setup-field">
-        <label>Firebase API Key</label>
-        <input type="text" id="fb-apikey" placeholder="AIzaSy..." />
-      </div>
-      <div class="setup-field">
-        <label>Firebase Project ID</label>
-        <input type="text" id="fb-project" placeholder="shoping-83493" />
-      </div>
-      <div class="setup-field">
-        <label>Firebase App ID</label>
-        <input type="text" id="fb-appid" placeholder="1:...:web:..." />
-      </div>
-      <p class="setup-err" id="setup-err"></p>
-      <button class="setup-btn" onclick="saveSetup()">שמור והתחל</button>
-    </div>
-  </div>
 
   <!-- Main screen -->
   <div id="main-screen">
@@ -400,34 +374,16 @@ window.dispatchEvent(new Event('fb-ready'));
 
 <script>
 // ── Config ────────────────────────────────────────────────
-const CFG_KEY = 'slist_config_v1';
-let cfg = null;
+const cfg = {
+  antKey:    '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',
+  fbApiKey:  'AIzaSyD_UcFfuBdQMkRiEwZPhcxqdxmLCmgp6CU',
+  fbProject: 'shoping-83493',
+  fbAppId:   '1:508380767537:web:20410bed78a0ed36587c10'
+};
 let db = null, unsubscribe = null;
 let items = [];
 let chatHistory = [];
 let recog = null, isRec = false;
-
-function loadCfg() {
-  try { return JSON.parse(localStorage.getItem(CFG_KEY)); } catch(e) { return null; }
-}
-function saveCfg(c) { localStorage.setItem(CFG_KEY, JSON.stringify(c)); }
-
-function saveSetup() {
-  const antKey   = document.getElementById('ant-key').value.trim();
-  const fbApiKey = document.getElementById('fb-apikey').value.trim();
-  const fbProject= document.getElementById('fb-project').value.trim();
-  const fbAppId  = document.getElementById('fb-appid').value.trim();
-  const err = document.getElementById('setup-err');
-
-  if (!antKey || !fbApiKey || !fbProject || !fbAppId) {
-    err.textContent = 'נא למלא את כל השדות';
-    err.style.display = 'block'; return;
-  }
-  err.style.display = 'none';
-  cfg = { antKey, fbApiKey, fbProject, fbAppId };
-  saveCfg(cfg);
-  initApp();
-}
 
 // ── Firebase init ─────────────────────────────────────────
 function initFirebase() {
@@ -484,18 +440,12 @@ function setSyncStatus(cls, text) {
 
 // ── Init ──────────────────────────────────────────────────
 function initApp() {
-  document.getElementById('setup-screen').classList.remove('active');
   document.getElementById('main-screen').classList.add('active');
   initFirebase();
 }
 
 // Boot
-cfg = loadCfg();
-if (cfg) {
-  initApp();
-} else {
-  document.getElementById('setup-screen').classList.add('active');
-}
+initApp();
 
 // ── Render ────────────────────────────────────────────────
 const CAT_ICONS = {
