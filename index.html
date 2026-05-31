@@ -285,18 +285,57 @@ header {
 }
 @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
 #send-btn {
-  background: var(--accent); border-color: var(--accent); color: #000;
+  background: var(--accent); border: none; color: #000;
+  border-radius: 22px; padding: 0 18px;
+  font-family: inherit; font-size: 14px; font-weight: 600;
+  cursor: pointer; height: 42px; flex-shrink: 0;
+  transition: opacity 0.2s;
 }
 #send-btn:hover { opacity: 0.85; }
 
-/* Mobile tweaks */
-@media (max-width: 480px) {
-  #list-panel { width: 42%; }
-  .msg { font-size: 13px; }
-  #txt { font-size: 13px; }
+/* ── Toast (mobile bot replies) ── */
+#toast {
+  display: none;
+  position: fixed; top: 62px; left: 50%; transform: translateX(-50%);
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 14px; padding: 10px 18px;
+  font-size: 13px; color: var(--text); line-height: 1.5;
+  max-width: 88vw; text-align: center;
+  z-index: 200; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
-@media (max-width: 360px) {
-  #list-panel { width: 38%; }
+#toast.show {
+  display: block;
+  animation: toastIn 0.2s ease;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@media (max-width: 640px) {
+  /* Stack: list on top, input at bottom */
+  .body { flex-direction: column-reverse; }
+
+  #list-panel {
+    width: 100%; flex: 1;
+    border-left: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Hide chat history on mobile — replies show as toast */
+  #messages, #typing, #hints { display: none; }
+  #chat-panel { flex: 0 0 auto; }
+
+  /* Touch-friendly targets */
+  .chk { width: 26px; height: 26px; }
+  .item { padding: 14px 16px; min-height: 52px; }
+  .del-btn { opacity: 1; color: var(--muted); font-size: 22px; padding: 4px 8px; }
+  .btn-circle { width: 44px; height: 44px; font-size: 20px; }
+  .item-name { font-size: 15px; }
+  .cat-label { font-size: 11px; padding: 7px 16px; }
+
+  /* Safe area for notched phones */
+  #input-row { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
 }
 
 /* Scrollbar */
@@ -342,7 +381,7 @@ header {
             <textarea id="txt" rows="1" placeholder="תגיד מה לקנות..."
               onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
           </div>
-          <button class="btn-circle" id="send-btn" onclick="sendMsg()">↑</button>
+          <button id="send-btn" onclick="sendMsg()">שלח</button>
         </div>
       </div>
 
@@ -361,6 +400,8 @@ header {
     </div>
   </div>
 </div>
+
+<div id="toast"></div>
 
 <!-- Firebase -->
 <script type="module">
@@ -625,7 +666,16 @@ function applyCmd(cmd) {
 }
 
 // ── Chat UI ───────────────────────────────────────────────
+let _toastTimer = null;
 function addBot(html) {
+  if (window.innerWidth <= 640) {
+    const toast = document.getElementById('toast');
+    toast.innerHTML = html;
+    toast.classList.add('show');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+    return;
+  }
   const msgs = document.getElementById('messages');
   const d = document.createElement('div');
   d.className = 'msg bot'; d.innerHTML = html;
