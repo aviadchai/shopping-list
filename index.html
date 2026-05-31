@@ -520,15 +520,11 @@ function render() {
     byCat[c].push(it);
   });
 
-  const catOrder = Object.keys(byCat).sort((a,b) => {
-    const aD = byCat[a].every(i=>i.done) ? 1 : 0;
-    const bD = byCat[b].every(i=>i.done) ? 1 : 0;
-    return aD - bD;
-  });
+  const catOrder = Object.keys(byCat);
 
   scroll.innerHTML = catOrder.map(cat => {
     const icon = CAT_ICONS[cat] || '🛒';
-    const catItems = [...byCat[cat].filter(i=>!i.done), ...byCat[cat].filter(i=>i.done)];
+    const catItems = byCat[cat];
     return `<div class="cat-group">
       <div class="cat-label">${icon} ${cat}</div>
       ${catItems.map(it => `
