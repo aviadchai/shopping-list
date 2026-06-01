@@ -841,7 +841,7 @@ const SYSTEM = `אתה עוזר חכם לניהול רשימת קניות. המ�
 - health: ציון בריאות 1-5 לפי ידע כללי (1=מאוד לא בריא, 5=מאוד בריא). null אם לא ידוע.
 - health_note: משפט קצר מדוע — לדוג' "עשיר בסיבים", "הרבה נתרן", "מעובד מאוד", "חלבון איכותי". null אם אין. חייב להיות אמין בלבד.`;
 
-async function callClaude(userMsg) {
+async function callClaude(userMsg, onStream) {
   if (!cfg?.antKey) return { action: 'chat', reply: 'חסר API Key — נא לפתוח הגדרות' };
 
   const listCtx = items.length
@@ -861,21 +861,43 @@ async function callClaude(userMsg) {
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4000,
+      stream: true,
       system: SYSTEM + listCtx,
       messages: chatHistory.slice(-8)
     })
   });
 
-  const data = await resp.json();
-  if (data.error) throw new Error(data.error.message);
+  if (!resp.ok) { const e = await resp.json(); throw new Error(e.error?.message || resp.status); }
 
-  const text = data.content?.[0]?.text || '{}';
-  chatHistory.push({ role: 'assistant', content: text });
+  const reader = resp.body.getReader();
+  const dec = new TextDecoder();
+  let fullText = '', buf = '';
 
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    const lines = buf.split('\n'); buf = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const raw = line.slice(6).trim();
+      if (raw === '[DONE]') continue;
+      try {
+        const evt = JSON.parse(raw);
+        if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+          fullText += evt.delta.text;
+          onStream?.(fullText.length);
+        }
+        if (evt.type === 'error') throw new Error(evt.error?.message);
+      } catch(e) {}
+    }
+  }
+
+  chatHistory.push({ role: 'assistant', content: fullText });
   try {
-    return JSON.parse(text.replace(/```json|```/g,'').trim());
+    return JSON.parse(fullText.replace(/```json|```/g,'').trim());
   } catch(e) {
-    return { action: 'chat', reply: text };
+    return { action: 'chat', reply: fullText };
   }
 }
 
@@ -889,14 +911,12 @@ async function addItemsSeq(cmdItems, onProgress) {
     if (ex) { skipped.push(n); if (nn(qty)) ex.qty = nn(qty); ex.done = false; }
     else toAdd.push({ id: crypto.randomUUID(), name: n, qty: nn(qty), category: nn(category)||'אחר', note: nn(note), fun_fact: nn(fun_fact), health: Number(health)||null, health_note: nn(health_note), done: false });
   }
-  const BATCH = 3;
+  const big = toAdd.length > 4;
   for (let i = 0; i < toAdd.length; i++) {
     items.push(toAdd[i]);
-    if ((i + 1) % BATCH === 0 || i === toAdd.length - 1) {
-      render();
-      onProgress?.(i + 1, toAdd.length);
-      if (i < toAdd.length - 1) await new Promise(r => setTimeout(r, 60));
-    }
+    render();
+    onProgress?.(i + 1, toAdd.length);
+    if (big && i < toAdd.length - 1) await new Promise(r => setTimeout(r, 35));
   }
   if (toAdd.length) await persistItems();
   return skipped;
@@ -970,27 +990,26 @@ async function sendMsg() {
   addUser(text);
   inp.value = ''; autoResize(inp);
 
-  if (window.innerWidth <= 640) {
-    const toast = document.getElementById('toast');
-    const label = text.length > 80 ? `⏳ מעבד ${text.length} תווים...` : '⏳ מעבד...';
-    toast.innerHTML = `<span class="toast-msg">${label}</span>`;
-    toast.classList.add('show', 'processing');
+  const isMobile = window.innerWidth <= 640;
+  const _setToast = html => {
+    const t = document.getElementById('toast');
+    t.innerHTML = `<span class="toast-msg">${html}</span>`;
+    t.classList.add('show', 'processing');
     clearTimeout(_toastTimer);
-  }
+  };
+  if (isMobile) _setToast('⏳ שולח<span class="proc-dots"></span>');
 
   const typing = document.getElementById('typing');
   typing.classList.add('show');
   try {
-    const cmd = await callClaude(text);
+    const cmd = await callClaude(text, chars => {
+      if (isMobile) _setToast(`⏳ מקבל<span class="proc-dots"></span> <small>${chars} תווים</small>`);
+    });
     let skipped = [];
 
     if (cmd.action === 'add' && cmd.items?.length) {
-      const total = cmd.items.length;
       skipped = await addItemsSeq(cmd.items, (done, tot) => {
-        if (window.innerWidth <= 640 && tot > 1) {
-          const t = document.getElementById('toast');
-          t.innerHTML = `<span class="toast-msg">מוסיף ${done} מתוך ${tot}<span class="proc-dots"></span></span>`;
-        }
+        if (isMobile && tot > 4) _setToast(`מוסיף ${done} מתוך ${tot}…`);
       });
     } else {
       const res = applyCmd(cmd);
