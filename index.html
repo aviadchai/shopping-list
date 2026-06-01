@@ -339,7 +339,7 @@ header {
 }
 
 /* ── Category collapse & drag ── */
-.cat-label { cursor: pointer; user-select: none; }
+.cat-label { cursor: pointer; user-select: none; position: relative; overflow: hidden; }
 .cat-lbl-text { flex: 1; }
 .cat-arrow {
   font-size: 12px; transition: transform 0.2s;
@@ -364,6 +364,17 @@ header {
   border-radius: 6px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.5);
 }
+.cat-count { font-size: 10px; color: var(--muted); font-weight: 500; }
+.cat-progress {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px; background: var(--border);
+}
+.cat-progress-fill {
+  height: 100%; background: var(--accent);
+  transition: width 0.4s ease;
+  border-radius: 2px;
+}
+.cat-done { text-decoration: line-through; opacity: 0.45; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 3px; }
@@ -561,11 +572,17 @@ function render() {
     const icon = CAT_ICONS[cat] || '🛒';
     const catItems = byCat[cat];
     const collapsed = collapsedCats.has(cat);
+    const doneCount = catItems.filter(i => i.done).length;
+    const total = catItems.length;
+    const pct = total ? Math.round(doneCount / total * 100) : 0;
+    const allDone = doneCount === total && total > 0;
     return `<div class="cat-group" data-cat="${esc(cat)}">
       <div class="cat-label" onclick="catClick(event,'${cat}')">
         <span class="drag-handle">⠿</span>
-        <span class="cat-lbl-text">${icon} ${cat}</span>
+        <span class="cat-lbl-text${allDone?' cat-done':''}">${icon} ${cat}</span>
+        <span class="cat-count">${doneCount}/${total}</span>
         <span class="cat-arrow${collapsed?' col':''}">▾</span>
+        <div class="cat-progress"><div class="cat-progress-fill" style="width:${pct}%"></div></div>
       </div>
       <div class="cat-items${collapsed?' hidden':''}">
         ${catItems.map(it => `
@@ -618,16 +635,17 @@ function startCatDrag(e) {
 
   group.classList.add('dragging');
   const offsetY = e.clientY - rect.top;
-  handle.setPointerCapture(e.pointerId);
+  try { handle.setPointerCapture(e.pointerId); } catch(_) {}
 
   const onMove = e => {
-    ghost.style.top = (e.clientY - offsetY) + 'px';
+    const y = e.clientY;
+    ghost.style.top = (y - offsetY) + 'px';
     const all = [...container.querySelectorAll('.cat-group')];
     let placed = false;
     for (const g of all) {
       if (g === group) continue;
       const r = g.getBoundingClientRect();
-      if (e.clientY < r.top + r.height / 2) {
+      if (y < r.top + r.height / 2) {
         container.insertBefore(group, g);
         placed = true;
         break;
@@ -637,21 +655,85 @@ function startCatDrag(e) {
   };
 
   const onUp = () => {
-    handle.removeEventListener('pointermove', onMove);
-    handle.removeEventListener('pointerup', onUp);
+    document.removeEventListener('pointermove', onMove);
+    document.removeEventListener('pointerup', onUp);
     ghost.remove();
     group.classList.remove('dragging');
     catOrderOverride = [...container.querySelectorAll('.cat-group')].map(g => g.dataset.cat);
     localStorage.setItem('cat_order', JSON.stringify(catOrderOverride));
   };
 
-  handle.addEventListener('pointermove', onMove);
-  handle.addEventListener('pointerup', onUp);
+  document.addEventListener('pointermove', onMove);
+  document.addEventListener('pointerup', onUp);
+}
+
+// ── Confetti ──────────────────────────────────────────────
+function launchConfetti(labelEl) {
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:999;';
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  const rect = labelEl.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const colors = ['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7','#06b6d4','#fff'];
+  const pts = Array.from({length: 55}, () => ({
+    x: cx, y: cy,
+    vx: (Math.random() - 0.5) * 10,
+    vy: -(Math.random() * 9 + 3),
+    color: colors[Math.floor(Math.random() * colors.length)],
+    w: Math.random() * 7 + 3,
+    h: Math.random() * 4 + 2,
+    alpha: 1,
+    rot: Math.random() * 360,
+    rotV: (Math.random() - 0.5) * 12
+  }));
+  (function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+    pts.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.35;
+      p.vx *= 0.99; p.alpha -= 0.016; p.rot += p.rotV;
+      if (p.alpha <= 0) return;
+      alive = true;
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = p.color;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    if (alive) requestAnimationFrame(draw);
+    else canvas.remove();
+  })();
+}
+
+function checkCatComplete(prevItems) {
+  const prev = {};
+  prevItems.forEach(i => { const c = i.category||'אחר'; (prev[c]=prev[c]||[]).push(i); });
+  const curr = {};
+  items.forEach(i => { const c = i.category||'אחר'; (curr[c]=curr[c]||[]).push(i); });
+  for (const cat in curr) {
+    if (curr[cat].every(i=>i.done) && !prev[cat]?.every(i=>i.done)) {
+      setTimeout(() => {
+        const el = document.querySelector(`.cat-group[data-cat="${cat}"] .cat-label`);
+        if (el) launchConfetti(el);
+      }, 120);
+    }
+  }
 }
 
 function toggle(id) {
   const it = items.find(i => i.id === id);
-  if (it) { it.done = !it.done; persistItems(); render(); }
+  if (it) {
+    const prev = items.map(i => ({...i}));
+    it.done = !it.done;
+    if (it.done) checkCatComplete(prev);
+    persistItems(); render();
+  }
 }
 function delItem(id) {
   items = items.filter(i => i.id !== id);
