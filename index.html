@@ -179,6 +179,19 @@ header {
 .item-name { font-size: 13px; transition: all 0.15s; }
 .item-name.done { text-decoration: line-through; color: var(--muted); }
 .item-note { font-size: 11px; color: var(--muted); }
+.item-fact {
+  display: none; font-size: 11px; color: #93c5fd;
+  line-height: 1.5; padding-top: 3px;
+  border-top: 1px solid var(--border); margin-top: 3px;
+}
+.item-fact.open { display: block; }
+.info-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--info); font-size: 13px; padding: 2px 4px;
+  flex-shrink: 0; opacity: 0.6; transition: opacity 0.15s;
+  font-style: italic; font-weight: 700; font-family: serif;
+}
+.info-btn:hover { opacity: 1; }
 .item-qty {
   font-size: 11px; padding: 1px 6px;
   background: rgba(59,130,246,0.15); color: #93c5fd;
@@ -593,8 +606,10 @@ function render() {
             <div class="item-name-wrap">
               <span class="item-name ${it.done?'done':''}">${esc(it.name)}</span>
               ${it.note ? `<span class="item-note">${esc(it.note)}</span>` : ''}
+              ${it.fun_fact ? `<span class="item-fact" id="fact-${it.id}">💡 ${esc(it.fun_fact)}</span>` : ''}
             </div>
             ${it.qty ? `<span class="item-qty">${esc(it.qty)}</span>` : ''}
+            ${it.fun_fact ? `<button class="info-btn" onclick="toggleFact('${it.id}')" title="הידעת?">ℹ</button>` : ''}
             <button class="del-btn" onclick="delItem('${it.id}')">×</button>
           </div>`).join('')}
       </div>
@@ -606,6 +621,9 @@ function render() {
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function toggleFact(id) {
+  document.getElementById('fact-' + id)?.classList.toggle('open');
 }
 
 // ── Category collapse ─────────────────────────────────────
@@ -768,7 +786,7 @@ const SYSTEM = `אתה עוזר חכם לניהול רשימת קניות. המ�
 מחלקות: ירקות ופירות, מאפייה, חלב וביצים, בשר ודגים, מוצרי ניקיון, שימורים ויבשים, משקאות, קפואים, ממתקים וחטיפים, אחר
 
 פורמט:
-{"action":"...","items":[{"name":"...","qty":"...","category":"...","note":"..."}],"fun_fact":"...","target":"...","new_name":"...","category":"...","reply":"..."}
+{"action":"...","items":[{"name":"...","qty":"...","category":"...","note":"...","fun_fact":"..."}],"target":"...","new_name":"...","category":"...","reply":"..."}
 
 כללים חשובים:
 - "תוציא X" / "הסר X" / "מחק X" = remove
@@ -781,7 +799,7 @@ const SYSTEM = `אתה עוזר חכם לניהול רשימת קניות. המ�
 - qty יכול להיות null אם לא צוין
 - שם הפריט חייב לכלול צבע / גודל / סוג / מותג אם צוינו (לדוג': "ניקול אדום", "חלב 3%", "לחם שיפון", "קולה זירו")
 - note: הערה קצרה אם יש שם אדם / הוראה ספציפית / הערה (לדוג': "לאוהד", "לא המלוח", "רק אורגני"). null אם אין.
-- fun_fact: בפעולת add בלבד — עובדה מדעית, היסטורית, או מעניינת אחת על אחד הפריטים שנוספו, משפט אחד קצר בעברית. null בשאר הפעולות.
+- fun_fact (בתוך כל פריט): עובדה מדעית / היסטורית / מעניינת על הפריט הספציפי הזה בדיוק — לא על מוצר בעל שם דומה. אם לא בטוח, החזר null. משפט אחד קצר בעברית. null בשאר הפעולות.
 - reply תמיד מלא, קצר, נעים, בעברית`;
 
 async function callClaude(userMsg) {
@@ -824,15 +842,21 @@ async function callClaude(userMsg) {
 
 function applyCmd(cmd) {
   const a = cmd.action;
+  const result = {};
   if (a === 'add' && cmd.items?.length) {
-    cmd.items.forEach(({ name, qty, category, note }) => {
+    const skipped = [];
+    cmd.items.forEach(({ name, qty, category, note, fun_fact }) => {
       if (!name) return;
       const ex = items.find(i => i.name.toLowerCase() === name.toLowerCase());
-      if (ex) { if (qty) ex.qty = qty; if (note) ex.note = note; ex.done = false; }
-      else items.push({ id: crypto.randomUUID(), name, qty: qty||null, category: category||'אחר', note: note||null, done: false });
+      if (ex) {
+        skipped.push(name);
+        if (qty) ex.qty = qty; if (note) ex.note = note; ex.done = false;
+      } else {
+        items.push({ id: crypto.randomUUID(), name, qty: qty||null, category: category||'אחר', note: note||null, fun_fact: fun_fact||null, done: false });
+      }
     });
     persistItems(); render();
-    if (cmd.fun_fact) setTimeout(() => addBot(`💡 <strong>הידעת?</strong> ${cmd.fun_fact}`), 400);
+    if (skipped.length) result.skipped = skipped;
   } else if (a === 'remove' && cmd.target) {
     const q = cmd.target.toLowerCase();
     items = items.filter(i => !i.name.toLowerCase().includes(q));
@@ -857,6 +881,7 @@ function applyCmd(cmd) {
     items = [];
     persistItems(); render();
   }
+  return result;
 }
 
 // ── Chat UI ───────────────────────────────────────────────
@@ -893,8 +918,12 @@ async function sendMsg() {
   typing.classList.add('show');
   try {
     const cmd = await callClaude(text);
-    applyCmd(cmd);
+    const res = applyCmd(cmd);
     if (cmd.reply) addBot(cmd.reply);
+    if (res.skipped?.length) {
+      const names = res.skipped.map(n => `<strong>${esc(n)}</strong>`).join(', ');
+      addBot(`המצרכים הבאים נכללו ברשימה המקורית: ${names}`);
+    }
   } catch(e) {
     addBot(`<span class="r">שגיאה: ${e.message}</span>`);
   } finally {
