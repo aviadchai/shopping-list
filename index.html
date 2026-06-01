@@ -344,6 +344,16 @@ header {
   from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+.proc-dots::after {
+  content: '';
+  animation: proc-dots 1.2s steps(1) infinite;
+}
+@keyframes proc-dots {
+  0%  { content: ''; }
+  33% { content: '.'; }
+  66% { content: '..'; }
+  99% { content: '...'; }
+}
 
 @media (max-width: 640px) {
   /* Stack: list on top, input at bottom */
@@ -850,7 +860,7 @@ async function callClaude(userMsg) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
+      max_tokens: 4000,
       system: SYSTEM + listCtx,
       messages: chatHistory.slice(-8)
     })
@@ -869,23 +879,34 @@ async function callClaude(userMsg) {
   }
 }
 
+const nn = v => (v == null || v === 'null' || v === '') ? null : v;
+
+async function addItemsSeq(cmdItems, onProgress) {
+  const toAdd = [], skipped = [];
+  for (const { name, qty, category, note, fun_fact, health, health_note } of cmdItems) {
+    const n = nn(name); if (!n) continue;
+    const ex = items.find(i => i.name.toLowerCase() === n.toLowerCase());
+    if (ex) { skipped.push(n); if (nn(qty)) ex.qty = nn(qty); ex.done = false; }
+    else toAdd.push({ id: crypto.randomUUID(), name: n, qty: nn(qty), category: nn(category)||'אחר', note: nn(note), fun_fact: nn(fun_fact), health: Number(health)||null, health_note: nn(health_note), done: false });
+  }
+  const BATCH = 3;
+  for (let i = 0; i < toAdd.length; i++) {
+    items.push(toAdd[i]);
+    if ((i + 1) % BATCH === 0 || i === toAdd.length - 1) {
+      render();
+      onProgress?.(i + 1, toAdd.length);
+      if (i < toAdd.length - 1) await new Promise(r => setTimeout(r, 60));
+    }
+  }
+  if (toAdd.length) await persistItems();
+  return skipped;
+}
+
 function applyCmd(cmd) {
   const a = cmd.action;
   const result = {};
-  if (a === 'add' && cmd.items?.length) {
-    const skipped = [];
-    cmd.items.forEach(({ name, qty, category, note, fun_fact, health, health_note }) => {
-      if (!name) return;
-      const ex = items.find(i => i.name.toLowerCase() === name.toLowerCase());
-      if (ex) {
-        skipped.push(name);
-        if (qty) ex.qty = qty; if (note) ex.note = note; ex.done = false;
-      } else {
-        items.push({ id: crypto.randomUUID(), name, qty: qty||null, category: category||'אחר', note: note||null, fun_fact: fun_fact||null, health: health||null, health_note: health_note||null, done: false });
-      }
-    });
-    persistItems(); render();
-    if (skipped.length) result.skipped = skipped;
+  if (a === 'add') {
+    result._asyncAdd = true; // handled in sendMsg
   } else if (a === 'remove' && cmd.target) {
     const q = cmd.target.toLowerCase();
     items = items.filter(i => !i.name.toLowerCase().includes(q));
@@ -961,10 +982,24 @@ async function sendMsg() {
   typing.classList.add('show');
   try {
     const cmd = await callClaude(text);
-    const res = applyCmd(cmd);
+    let skipped = [];
+
+    if (cmd.action === 'add' && cmd.items?.length) {
+      const total = cmd.items.length;
+      skipped = await addItemsSeq(cmd.items, (done, tot) => {
+        if (window.innerWidth <= 640 && tot > 1) {
+          const t = document.getElementById('toast');
+          t.innerHTML = `<span class="toast-msg">מוסיף ${done} מתוך ${tot}<span class="proc-dots"></span></span>`;
+        }
+      });
+    } else {
+      const res = applyCmd(cmd);
+      skipped = res.skipped || [];
+    }
+
     if (cmd.reply) addBot(cmd.reply);
-    if (res.skipped?.length) {
-      const names = res.skipped.map(n => `<strong>${esc(n)}</strong>`).join(', ');
+    if (skipped.length) {
+      const names = skipped.map(n => `<strong>${esc(n)}</strong>`).join(', ');
       addBot(`המצרכים הבאים נכללו ברשימה המקורית: ${names}`);
     }
   } catch(e) {
