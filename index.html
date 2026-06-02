@@ -457,6 +457,7 @@ header {
       <p id="header-sub">מופעל על Claude AI</p>
     </div>
     <span id="sync-status">⏳ מתחבר</span>
+    <button onclick="saveCfgKey()" title="הגדרות API Key" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);padding:4px">⚙️</button>
   </header>
 
 
@@ -524,12 +525,21 @@ window.dispatchEvent(new Event('fb-ready'));
 
 <script>
 // ── Config ────────────────────────────────────────────────
+const _stored = JSON.parse(localStorage.getItem('app_cfg') || '{}');
 const cfg = {
-  antKey:    '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',
-  fbApiKey:  'AIzaSyD_UcFfuBdQMkRiEwZPhcxqdxmLCmgp6CU',
-  fbProject: 'shoping-83493',
-  fbAppId:   '1:508380767537:web:20410bed78a0ed36587c10'
+  antKey:    _stored.antKey    || '',
+  fbApiKey:  _stored.fbApiKey  || 'AIzaSyD_UcFfuBdQMkRiEwZPhcxqdxmLCmgp6CU',
+  fbProject: _stored.fbProject || 'shoping-83493',
+  fbAppId:   _stored.fbAppId   || '1:508380767537:web:20410bed78a0ed36587c10'
 };
+function saveCfgKey(key) {
+  const k = prompt('הכנס Anthropic API Key:');
+  if (!k?.startsWith('sk-')) return alert('מפתח לא תקין');
+  cfg.antKey = k;
+  _stored.antKey = k;
+  localStorage.setItem('app_cfg', JSON.stringify(_stored));
+  alert('נשמר ✓');
+}
 let db = null, unsubscribe = null;
 let items = [];
 let chatHistory = [];
@@ -1121,17 +1131,38 @@ function fillHint(t) {
 }
 
 // ── Voice ─────────────────────────────────────────────────
-function toggleMic() {
+async function toggleMic() {
+  if (isRec) { recog?.stop(); return; }
+
   if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-    addBot('הדפדפן לא תומך בזיהוי קולי — נסה Chrome');
+    addBot('הדפדפן לא תומך בזיהוי קולי — פתח ב-Safari');
     return;
   }
-  if (isRec) { recog.stop(); return; }
+
+  // iOS requires getUserMedia permission before SpeechRecognition works
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach(t => t.stop());
+  } catch(e) {
+    addBot('לא ניתנה הרשאת מיקרופון — אפשר ב-הגדרות → Safari → מיקרופון');
+    return;
+  }
+
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recog = new SR(); recog.lang = 'he-IL';
+  recog = new SR();
+  recog.lang = 'he-IL';
+  recog.continuous = false;
+  recog.interimResults = false;
   recog.onstart = () => { isRec = true; document.getElementById('mic-btn').classList.add('rec'); };
-  recog.onresult = e => { document.getElementById('txt').value = e.results[0][0].transcript; sendMsg(); };
-  recog.onerror = () => addBot('לא הצלחתי לשמוע 🎤');
+  recog.onresult = e => {
+    const txt = Array.from(e.results).map(r => r[0].transcript).join('');
+    document.getElementById('txt').value = txt;
+    sendMsg();
+  };
+  recog.onerror = e => {
+    const msgs = { 'not-allowed':'אין הרשאת מיקרופון', 'no-speech':'לא זוהה דיבור', 'network':'שגיאת רשת' };
+    addBot('🎤 ' + (msgs[e.error] || 'שגיאה: ' + e.error));
+  };
   recog.onend = () => { isRec = false; document.getElementById('mic-btn').classList.remove('rec'); };
   recog.start();
 }
