@@ -4,7 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>רשימת קניות</title>
-<link rel="manifest" href="data:application/json,{%22name%22:%22רשימת קניות%22,%22display%22:%22standalone%22,%22background_color%22:%22%230a0a0b%22}">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon.svg">
+<meta name="theme-color" content="#0a0a0b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="קניות">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@300;400;500;600;700&display=swap');
 
@@ -1067,6 +1072,11 @@ function toggleMic() {
   recog.onerror = () => addBot('לא הצלחתי לשמוע 🎤');
   recog.onend = () => { isRec = false; document.getElementById('mic-btn').classList.remove('rec'); };
   recog.start();
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
 }
 </script>
 </body>
