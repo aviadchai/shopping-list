@@ -128,13 +128,21 @@ header {
   padding: 1px 7px; border-radius: 10px;
 }
 .clear-done-btn {
-  margin-right: auto;
   background: none; border: 1px solid var(--border);
   color: var(--muted); font-family: inherit; font-size: 11px;
   padding: 2px 8px; border-radius: 6px; cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s; flex-shrink: 0;
 }
 .clear-done-btn:hover { color: var(--danger); border-color: var(--danger); }
+.list-progress-bar {
+  flex: 1; height: 4px; background: var(--border);
+  border-radius: 4px; overflow: hidden;
+}
+.list-progress-bar > div {
+  height: 100%; background: var(--accent);
+  transition: width 0.4s ease; border-radius: 4px;
+  width: 0%;
+}
 
 #items-scroll { flex: 1; overflow-y: auto; }
 
@@ -193,12 +201,20 @@ header {
 .h3 { background: #eab308; }
 .h4 { background: #84cc16; }
 .h5 { background: #22c55e; }
-.item-fact {
-  display: none; font-size: 11px; color: #93c5fd;
-  line-height: 1.5; padding-top: 3px;
-  border-top: 1px solid var(--border); margin-top: 3px;
+#item-popup {
+  display: none; position: fixed; z-index: 400;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 12px; padding: 12px 14px 12px 32px;
+  max-width: 230px; font-size: 12px; line-height: 1.6;
+  color: var(--text); box-shadow: 0 8px 28px rgba(0,0,0,0.55);
 }
-.item-fact.open { display: block; }
+#item-popup.open { display: block; animation: toastIn 0.18s ease; }
+.popup-close {
+  position: absolute; top: 7px; left: 10px;
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 17px; line-height: 1; padding: 0;
+}
+.popup-close:hover { color: var(--text); }
 .info-btn {
   width: 17px; height: 17px; flex-shrink: 0;
   border: 1.5px solid var(--info); border-radius: 50%;
@@ -210,10 +226,19 @@ header {
 }
 .info-btn:hover, .info-btn.active { background: var(--info); color: #000; opacity: 1; }
 .item-qty {
-  font-size: 11px; padding: 1px 6px;
+  font-size: 11px; padding: 1px 5px;
   background: rgba(59,130,246,0.15); color: #93c5fd;
-  border-radius: 8px; flex-shrink: 0;
+  border-radius: 6px; flex-shrink: 0;
 }
+.qty-ctrl { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+.qty-btn {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 1px solid var(--border2); background: none;
+  color: var(--muted); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; padding: 0; line-height: 1;
+}
+.qty-btn:hover { border-color: var(--accent); color: var(--accent); }
 .del-btn {
   background: none; border: none; cursor: pointer;
   color: var(--border2); font-size: 17px; line-height: 1;
@@ -412,17 +437,8 @@ header {
   border-radius: 6px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.5);
 }
-.cat-count { font-size: 10px; color: var(--muted); font-weight: 500; }
-.cat-progress {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  height: 2px; background: var(--border);
-}
-.cat-progress-fill {
-  height: 100%; background: var(--accent);
-  transition: width 0.4s ease;
-  border-radius: 2px;
-}
-.cat-done { text-decoration: line-through; opacity: 0.45; }
+.cat-complete { opacity: 0.38; transition: opacity 0.4s; }
+.cat-complete-mark { color: var(--accent); font-size: 11px; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 3px; }
@@ -476,6 +492,8 @@ header {
         <div class="panel-head">
           <span>רשימה</span>
           <span class="badge" id="item-count">0</span>
+          <div class="list-progress-bar"><div id="list-progress-fill"></div></div>
+          <span id="list-progress-pct" style="font-size:10px;color:var(--muted);flex-shrink:0"></span>
           <button class="clear-done-btn" onclick="clearDone()">נקה ✓</button>
           <button class="clear-done-btn" style="color:var(--danger);border-color:var(--danger)" onclick="clearAll()">מחק הכל</button>
         </div>
@@ -489,6 +507,10 @@ header {
 </div>
 
 <div id="toast"></div>
+<div id="item-popup">
+  <button class="popup-close" onclick="closePopup()">×</button>
+  <div id="item-popup-content"></div>
+</div>
 
 <!-- Firebase -->
 <script type="module">
@@ -617,36 +639,49 @@ function render() {
     ];
   }
 
+  // Update single list progress bar
+  const totalAll = items.length, doneAll = items.filter(i=>i.done).length;
+  const pctAll = totalAll ? Math.round(doneAll/totalAll*100) : 0;
+  const fill = document.getElementById('list-progress-fill');
+  if (fill) fill.style.width = pctAll + '%';
+  const pctEl = document.getElementById('list-progress-pct');
+  if (pctEl) pctEl.textContent = totalAll ? `${doneAll}/${totalAll}` : '';
+
   scroll.innerHTML = catOrder.map(cat => {
     const icon = CAT_ICONS[cat] || '🛒';
     const catItems = byCat[cat];
     const collapsed = collapsedCats.has(cat);
     const doneCount = catItems.filter(i => i.done).length;
     const total = catItems.length;
-    const pct = total ? Math.round(doneCount / total * 100) : 0;
     const allDone = doneCount === total && total > 0;
-    return `<div class="cat-group" data-cat="${esc(cat)}">
+    return `<div class="cat-group${allDone?' cat-complete':''}" data-cat="${esc(cat)}">
       <div class="cat-label" onclick="catClick(event,'${cat}')">
         <span class="drag-handle">⠿</span>
-        <span class="cat-lbl-text${allDone?' cat-done':''}">${icon} ${cat}</span>
-        <span class="cat-count">${doneCount}/${total}</span>
+        <span class="cat-lbl-text">${icon} ${cat}</span>
+        ${allDone ? `<span class="cat-complete-mark">✓</span>` : `<span style="font-size:10px;color:var(--muted)">${doneCount}/${total}</span>`}
         <span class="cat-arrow${collapsed?' col':''}">▾</span>
-        <div class="cat-progress"><div class="cat-progress-fill" style="width:${pct}%"></div></div>
       </div>
       <div class="cat-items${collapsed?' hidden':''}">
-        ${catItems.map(it => `
-          <div class="item">
+        ${catItems.map(it => {
+          const qtyNum = parseFloat(it.qty);
+          const hasArrows = it.qty && !isNaN(qtyNum);
+          const qtyHtml = it.qty
+            ? (hasArrows
+                ? `<div class="qty-ctrl"><button class="qty-btn" onclick="changeQty('${it.id}',-1)">−</button><span class="item-qty">${esc(it.qty)}</span><button class="qty-btn" onclick="changeQty('${it.id}',1)">+</button></div>`
+                : `<span class="item-qty">${esc(it.qty)}</span>`)
+            : '';
+          return `<div class="item">
             <div class="chk ${it.done?'done':''}" onclick="toggle('${it.id}')"></div>
-            ${it.health ? `<span class="health-dot h${it.health}" title="בריאות ${it.health}/5"></span>` : ''}
+            ${it.health ? `<span class="health-dot h${it.health}"></span>` : ''}
             <div class="item-name-wrap">
               <span class="item-name ${it.done?'done':''}">${esc(it.name)}</span>
-              ${it.note ? `<span class="item-note">${esc(it.note)}</span>` : ''}
-              ${(it.fun_fact||it.health_note) ? `<span class="item-fact" id="fact-${it.id}">${it.health_note?`🏥 ${esc(it.health_note)}`:''}${(it.health_note&&it.fun_fact)?'<br>':''}${it.fun_fact?`💡 ${esc(it.fun_fact)}`:''}</span>` : ''}
+              ${it.note ? `<span class="item-note">· ${esc(it.note)}</span>` : ''}
             </div>
-            ${it.qty ? `<span class="item-qty">${esc(it.qty)}</span>` : ''}
-            ${(it.fun_fact||it.health_note) ? `<button class="info-btn" onclick="toggleFact('${it.id}')" title="מידע">i</button>` : ''}
+            ${qtyHtml}
+            ${(it.fun_fact||it.health_note) ? `<button class="info-btn${it.health?' active':''}" onclick="showInfoPopup('${it.id}',this)" title="מידע">i</button>` : ''}
             <button class="del-btn" onclick="delItem('${it.id}')">×</button>
-          </div>`).join('')}
+          </div>`;
+        }).join('')}
       </div>
     </div>`;
   }).join('');
@@ -657,13 +692,40 @@ function render() {
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-function toggleFact(id) {
-  const fact = document.getElementById('fact-' + id);
-  if (!fact) return;
-  fact.classList.toggle('open');
-  const btn = fact.closest('.item')?.querySelector('.info-btn');
-  btn?.classList.toggle('active', fact.classList.contains('open'));
+function changeQty(id, delta) {
+  const it = items.find(i => i.id === id);
+  if (!it) return;
+  const n = parseFloat(it.qty) || 1;
+  const next = Math.max(1, Math.round((n + delta) * 10) / 10);
+  it.qty = String(next);
+  persistItems(); render();
 }
+
+const HC = ['','#ef4444','#f97316','#eab308','#84cc16','#22c55e'];
+function showInfoPopup(id, btn) {
+  const popup = document.getElementById('item-popup');
+  if (popup.dataset.id === id && popup.classList.contains('open')) { closePopup(); return; }
+  const it = items.find(i => i.id === id);
+  if (!it) return;
+  const parts = [];
+  if (it.health) parts.push(`<span style="color:${HC[it.health]||'#888'}">●</span> בריאות ${it.health}/5${it.health_note?' — '+esc(it.health_note):''}`);
+  if (it.fun_fact) parts.push(`💡 ${esc(it.fun_fact)}`);
+  document.getElementById('item-popup-content').innerHTML = parts.join('<br><br>');
+  popup.dataset.id = id;
+  const r = btn.getBoundingClientRect();
+  let top = r.top - 8;
+  popup.style.bottom = 'auto';
+  popup.style.top = Math.max(8, top - 120) + 'px';
+  let left = r.left - 115;
+  popup.style.left = Math.max(8, Math.min(left, window.innerWidth - 246)) + 'px';
+  popup.classList.add('open');
+}
+function closePopup() {
+  document.getElementById('item-popup')?.classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#item-popup') && !e.target.closest('.info-btn')) closePopup();
+});
 
 // ── Category collapse ─────────────────────────────────────
 function catClick(e, cat) {
@@ -1015,7 +1077,7 @@ async function sendMsg() {
     t.classList.add('show', 'processing');
     clearTimeout(_toastTimer);
   };
-  if (isMobile) _setToast('⏳ מעבד<span class="proc-dots"></span>');
+  if (isMobile && text.length > 60) _setToast('⏳ מעבד<span class="proc-dots"></span>');
 
   const typing = document.getElementById('typing');
   typing.classList.add('show');
