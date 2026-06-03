@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>רשימת קניות</title>
+<title>Carty</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.svg">
 <meta name="theme-color" content="#0a0a0b">
@@ -453,8 +453,7 @@ header {
   <header>
     <span class="logo">🛒</span>
     <div class="header-text">
-      <h1>רשימת קניות</h1>
-      <p id="header-sub">מופעל על Claude AI</p>
+      <h1>Carty</h1>
     </div>
     <span id="sync-status">⏳ מתחבר</span>
     <button onclick="saveCfgKey()" title="הגדרות API Key" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);padding:4px">⚙️</button>
@@ -888,40 +887,16 @@ function clearAll() {
 }
 
 // ── Claude API ────────────────────────────────────────────
-const SYSTEM = `אתה עוזר חכם לניהול רשימת קניות. המשתמש מדבר איתך בעברית טבעית — כל ניסוח.
-עליך להחזיר JSON בלבד, ללא markdown, ללא הסברים. תמיד JSON אחד בלבד.
-
-פעולות אפשריות:
-- add: הוסף פריטים
-- clarify: שאל שאלה מבהירה לפני הוספה — כשהמוצר דו-משמעי (לדוג': חומוס למריחה או גרגירים? קולה רגיל או זירו? יוגורט איזה אחוז?). אל תוסיף כלום, רק שאל ב-reply.
-- remove: הסר פריט (לפי target - שם חלקי)
-- update: שנה שם / קטגוריה / כמות של פריט קיים
-- toggle_done: סמן/בטל סימון פריט
-- clear_done: מחק את כל הסומנים
-- clear_all: מחק הכל
-- show: הצג רשימה
-- chat: תשובה ללא שינוי — כולל המלצות על מוצרים, השוואות, עצות קנייה
-
+const SYSTEM = `ניהול רשימת קניות. החזר JSON בלבד.
+פעולות: add | remove | update | toggle_done | clear_done | clear_all | chat
 מחלקות: ירקות ופירות, מאפייה, חלב וביצים, בשר ודגים, מוצרי ניקיון, שימורים ויבשים, משקאות, קפואים, ממתקים וחטיפים, אחר
-
-פורמט:
-{"action":"...","items":[{"name":"...","qty":"...","category":"...","note":"..."}],"target":"...","new_name":"...","category":"...","reply":"..."}
-
-כללים חשובים:
-- "תוציא X" / "הסר X" / "מחק X" = remove
-- "תחזיר X" = add
-- "סמן X" / "קניתי X" = toggle_done
-- "שנה שם X ל-Y" / "תחליף X ב-Y" = update עם target=X, new_name=Y
-- "העבר X למחלקה Y" / "תעביר X ל-Y" = update עם target=X, category=Y
-- update יכול לשנות גם שם וגם קטגוריה בבת אחת
-- אף פעם לא שתי פעולות נפרדות במקום update אחד
-- qty יכול להיות null אם לא צוין
-- שם הפריט חייב לכלול צבע / גודל / סוג / מותג אם צוינו (לדוג': "ניקול אדום", "חלב 3%", "לחם שיפון", "קולה זירו")
-- note: הערה קצרה אם יש שם אדם / הוראה ספציפית / הערה (לדוג': "לאוהד", "לא המלוח", "רק אורגני"). null אם אין.
-- reply תמיד קצר ונעים בעברית
-- כשמוסיפים מוצר עם וריאנטים — הוסף טיפ קצר ב-reply
-- אם המשתמש שואל "איזה X מומלץ" — action:chat עם המלצה אמינה
-- כשמודבק טקסט ארוך שנראה כמתכון — חלץ רק מרכיבים (שם + כמות), התעלם מהוראות הכנה`;
+פורמט: {"action":"...","items":[{"name":"...","qty":"...","category":"...","note":"..."}],"target":"...","new_name":"...","category":"...","reply":"..."}
+כללים:
+- add תמיד מיד. וריאנטים = הוסף גנרי + ב-reply הצע: "הוספתי! רוצה לדייק? 🔹 למריחה 🔹 גרגירים"
+- שם הפריט כולל צבע/גודל/מותג אם צוין. note לאדם/הוראה ספציפית
+- מתכון = חלץ רק מרכיבים (שם+כמות), דלג הוראות הכנה
+- chat: המלצות ועצות ישירות ואמינות
+- reply קצר ונעים בעברית`;
 
 async function callClaude(userMsg) {
   if (!cfg?.antKey) return { action: 'chat', reply: 'חסר API Key — נא לפתוח הגדרות' };
@@ -941,10 +916,10 @@ async function callClaude(userMsg) {
       'anthropic-dangerous-direct-browser-access': 'true'
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4000,
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 2000,
       system: SYSTEM + listCtx,
-      messages: chatHistory.slice(-8)
+      messages: chatHistory.slice(-4)
     })
   });
 
