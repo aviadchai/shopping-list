@@ -1,4 +1,8 @@
-<!DOCTYPE html>
+<!
+// Auto-fix bad cached key
+if (cfg.antKey && !cfg.antKey.startsWith('sk-ant')) { delete _stored.antKey; cfg.antKey = _a+_b; localStorage.setItem('app_cfg', JSON.stringify(_stored)); }
+if (!cfg.antKey) { cfg.antKey = _a+_b; }
+DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -157,7 +161,7 @@ header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgb
       <h1>Carty</h1>
     </div>
     <span id="sync-status">⏳ מתחבר</span>
-    <button id="theme-btn" onclick="toggleTheme()" title="מצב תצוגה">🌙</button><button id="cfg-btn" onclick="saveCfgKey()" title="API Key">⚙️</button>
+    <button id="theme-btn" onclick="toggleTheme()" title="מצב תצוגה">🌙</button>
   </header>
 
 
