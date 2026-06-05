@@ -606,23 +606,15 @@ const SYSTEM = `ניהול רשימת קניות. החזר JSON בלבד.
 - reply קצר ונעים בעברית`;
 
 async function callClaude(userMsg) {
-  
-
   const listCtx = items.length
-    ? '\n\nרשימה נוכחית:\n' + items.map(i=>`- ${i.name}${i.qty?` ×${i.qty}`:''}${i.done?' [נקנה]':''} [${i.category||'אחר'}]`).join('\n')
+    ? '\n\nרשימה נוכחית:\n' + items.map(i=>`- ${i.name}${i.qty?' x'+i.qty:''}${i.done?' [נקנה]':''} [${i.category||'אחר'}]`).join('\n')
     : '\n\nהרשימה ריקה.';
 
   chatHistory.push({ role: 'user', content: userMsg });
 
-  const apiUrl = (localStorage.getItem('worker_url') || 'https://api.anthropic.com/v1/messages');
-  const resp = await fetch(apiUrl, {
+  const resp = await fetch('https://carty-api.aviadchai.workers.dev', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': cfg.antKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 2000,
@@ -632,22 +624,12 @@ async function callClaude(userMsg) {
   });
 
   const data = await resp.json();
-  if (data.error) {
-    if (data.error.type === 'authentication_error' || data.error.status === 401) {
-      cfg.antKey = '';
-      const s = JSON.parse(localStorage.getItem('app_cfg') || '{}');
-      delete s.antKey;
-      localStorage.setItem('app_cfg', JSON.stringify(s));
-      showKeyModal();
-      throw new Error('מפתח לא תקין — הזן מפתח חדש');
-    }
-    throw new Error(data.error.message);
-  }
+  if (data.error) throw new Error(data.error.message);
 
   const text = data.content?.[0]?.text || '{}';
   chatHistory.push({ role: 'assistant', content: text });
   try {
-    return JSON.parse(text.replace(/```json|```/g,'').trim());
+    return JSON.parse(text.replace(/```json|```/g, '').trim());
   } catch(e) {
     return { action: 'chat', reply: text };
   }
