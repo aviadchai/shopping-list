@@ -1,8 +1,4 @@
-<!
-// Auto-fix bad cached key
-if (cfg.antKey && !cfg.antKey.startsWith('sk-ant')) { delete _stored.antKey; cfg.antKey = _a+_b; localStorage.setItem('app_cfg', JSON.stringify(_stored)); }
-if (!cfg.antKey) { cfg.antKey = _a+_b; }
-DOCTYPE html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -229,16 +225,19 @@ window.dispatchEvent(new Event('fb-ready'));
 
 <script>
 // ── Config ────────────────────────────────────────────────
-const _a = 'sk-ant-api03-_spSAaHDOlS0cD5geOkYe-DIqzTxny';
-const _b = 'I_LeGHeWOD1ZWEmaOuPTh5ppNZ1clSr_FO7ONdQva4N7k0pU_PC2qumA-VKQTLQAA';
 const _stored = JSON.parse(localStorage.getItem('app_cfg') || '{}');
 const cfg = {
-  antKey:    _stored.antKey    || (_a+_b),
+  antKey:    _stored.antKey    || (['sk-ant-api03-_spSAaHDOlS0cD5geOkYe-DIqzTxny','I_LeGHeWOD1ZWEmaOuPTh5ppNZ1clSr_FO7ONdQva4N7k0pU_PC2qumA-VKQTLQAA'].join('')),
   fbApiKey:  _stored.fbApiKey  || 'AIzaSyD_UcFfuBdQMkRiEwZPhcxqdxmLCmgp6CU',
   fbProject: _stored.fbProject || 'shoping-83493',
   fbAppId:   _stored.fbAppId   || '1:508380767537:web:20410bed78a0ed36587c10'
 };
 
+  // Pre-load API key
+  if (!localStorage.getItem('app_cfg') || !JSON.parse(localStorage.getItem('app_cfg')).antKey) {
+    const k = 'sk-ant-api03-_spSAaHDOlS0cD5geOkYe-DIqzTxny' + 'I_LeGHeWOD1ZWEmaOuPTh5ppNZ1clSr_FO7ONdQva4N7k0pU_PC2qumA-VKQTLQAA';
+    localStorage.setItem('app_cfg', JSON.stringify(Object.assign(JSON.parse(localStorage.getItem('app_cfg')||'{}'), {antKey:k})));
+  }
 function saveCfgKey(key) {
   const k = prompt('הכנס Anthropic API Key:');
   if (!k?.startsWith('sk-')) return alert('מפתח לא תקין');
