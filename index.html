@@ -227,7 +227,7 @@ window.dispatchEvent(new Event('fb-ready'));
 // ── Config ────────────────────────────────────────────────
 const _stored = JSON.parse(localStorage.getItem('app_cfg') || '{}');
 const cfg = {
-  antKey:    _stored.antKey    || (['sk-ant-api03-_spSAaHDOlS0cD5geOkYe-DIqzTxny','I_LeGHeWOD1ZWEmaOuPTh5ppNZ1clSr_FO7ONdQva4N7k0pU_PC2qumA-VKQTLQAA'].join('')),
+  antKey:    _stored.antKey    || '',
   fbApiKey:  _stored.fbApiKey  || 'AIzaSyD_UcFfuBdQMkRiEwZPhcxqdxmLCmgp6CU',
   fbProject: _stored.fbProject || 'shoping-83493',
   fbAppId:   _stored.fbAppId   || '1:508380767537:web:20410bed78a0ed36587c10'
@@ -606,7 +606,7 @@ const SYSTEM = `ניהול רשימת קניות. החזר JSON בלבד.
 - reply קצר ונעים בעברית`;
 
 async function callClaude(userMsg) {
-  if (!cfg?.antKey) return { action: 'chat', reply: 'חסר API Key — נא לפתוח הגדרות' };
+  if (!cfg?.antKey) { showKeyModal(); return { action: 'chat', reply: '' }; }
 
   const listCtx = items.length
     ? '\n\nרשימה נוכחית:\n' + items.map(i=>`- ${i.name}${i.qty?` ×${i.qty}`:''}${i.done?' [נקנה]':''} [${i.category||'אחר'}]`).join('\n')
@@ -614,7 +614,8 @@ async function callClaude(userMsg) {
 
   chatHistory.push({ role: 'user', content: userMsg });
 
-  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+  const apiUrl = (localStorage.getItem('worker_url') || 'https://api.anthropic.com/v1/messages');
+  const resp = await fetch(apiUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -631,7 +632,17 @@ async function callClaude(userMsg) {
   });
 
   const data = await resp.json();
-  if (data.error) throw new Error(data.error.message);
+  if (data.error) {
+    if (data.error.type === 'authentication_error' || data.error.status === 401) {
+      cfg.antKey = '';
+      const s = JSON.parse(localStorage.getItem('app_cfg') || '{}');
+      delete s.antKey;
+      localStorage.setItem('app_cfg', JSON.stringify(s));
+      showKeyModal();
+      throw new Error('מפתח לא תקין — הזן מפתח חדש');
+    }
+    throw new Error(data.error.message);
+  }
 
   const text = data.content?.[0]?.text || '{}';
   chatHistory.push({ role: 'assistant', content: text });
@@ -812,6 +823,22 @@ function fillHint(t) {
   inp.value = t; inp.focus();
 }
 
+
+
+function showKeyModal() {
+  document.getElementById('key-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('key-input').focus(), 100);
+}
+function saveKey() {
+  const k = document.getElementById('key-input').value.trim();
+  const err = document.getElementById('key-err');
+  if (!k.startsWith('sk-')) { err.textContent = 'מפתח לא תקין — חייב להתחיל ב-sk-'; err.style.display='block'; return; }
+  cfg.antKey = k;
+  const s = JSON.parse(localStorage.getItem('app_cfg') || '{}');
+  s.antKey = k;
+  localStorage.setItem('app_cfg', JSON.stringify(s));
+  document.getElementById('key-modal').style.display = 'none';
+}
 
 // Theme toggle
 function toggleTheme() {
