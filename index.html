@@ -606,7 +606,7 @@ const SYSTEM = `ניהול רשימת קניות. החזר JSON בלבד.
 - reply קצר ונעים בעברית`;
 
 async function callClaude(userMsg) {
-  if (!cfg?.antKey) { showKeyModal(); return { action: 'chat', reply: '' }; }
+  // API handled by Worker
 
   const listCtx = items.length
     ? '\n\nרשימה נוכחית:\n' + items.map(i=>`- ${i.name}${i.qty?` ×${i.qty}`:''}${i.done?' [נקנה]':''} [${i.category||'אחר'}]`).join('\n')
@@ -663,7 +663,7 @@ fun_fact: עובדה מעניינת אחת על המוצר הזה בדיוק, ב
 async function enrichItem(item) {
   if (!cfg?.antKey || item.health !== undefined) return;
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch('https://carty-api.aviadchai.workers.dev', {
       method: 'POST',
       headers: { 'Content-Type':'application/json','x-api-key':cfg.antKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
       body: JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:200, system:ENRICH_SYS, messages:[{role:'user',content:item.name}] })
