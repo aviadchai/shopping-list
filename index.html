@@ -606,7 +606,7 @@ const SYSTEM = `ניהול רשימת קניות. החזר JSON בלבד.
 - reply קצר ונעים בעברית`;
 
 async function callClaude(userMsg) {
-  // API handled by Worker
+  
 
   const listCtx = items.length
     ? '\n\nרשימה נוכחית:\n' + items.map(i=>`- ${i.name}${i.qty?` ×${i.qty}`:''}${i.done?' [נקנה]':''} [${i.category||'אחר'}]`).join('\n')
@@ -825,21 +825,6 @@ function fillHint(t) {
 
 
 
-function showKeyModal() {
-  document.getElementById('key-modal').style.display = 'flex';
-  setTimeout(() => document.getElementById('key-input').focus(), 100);
-}
-function saveKey() {
-  const k = document.getElementById('key-input').value.trim();
-  const err = document.getElementById('key-err');
-  if (!k.startsWith('sk-')) { err.textContent = 'מפתח לא תקין — חייב להתחיל ב-sk-'; err.style.display='block'; return; }
-  cfg.antKey = k;
-  const s = JSON.parse(localStorage.getItem('app_cfg') || '{}');
-  s.antKey = k;
-  localStorage.setItem('app_cfg', JSON.stringify(s));
-  document.getElementById('key-modal').style.display = 'none';
-}
-
 // Theme toggle
 function toggleTheme() {
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
@@ -854,7 +839,7 @@ function toggleTheme() {
     document.documentElement.setAttribute('data-theme', 'light');
     document.addEventListener('DOMContentLoaded', () => {
       const btn = document.getElementById('theme-btn');
-      if (btn) btn.textContent = 'i☀️';
+      if (btn) btn.textContent = '☀️';
     });
   }
 })();
