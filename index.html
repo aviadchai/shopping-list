@@ -375,7 +375,7 @@ function render() {
   if (pctEl) pctEl.textContent = totalAll ? `${doneAll}/${totalAll}` : '';
 
   scroll.innerHTML = catOrder.map(cat => {
-    const icon = CAT_ICONS[cat] || '🛒';
+    const icon = CAT_ICONS[cat] || CAT_ICONS['אחר'];
     const catItems = byCat[cat];
     const collapsed = collapsedCats.has(cat);
     const doneCount = catItems.filter(i => i.done).length;
