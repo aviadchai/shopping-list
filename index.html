@@ -37,7 +37,7 @@ html,body{height:100%;height:100dvh;font-family:system-ui,-apple-system,sans-ser
 #app{display:flex;flex-direction:column;height:100dvh;}
 header{display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));background:rgba(28,28,30,0.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);flex-shrink:0;}
 [data-theme=light] header{background:rgba(255,255,255,0.88);}
-.logo{display:flex;align-items:center;color:var(--accent);}.header-text{flex:1;}
+.logo{display:flex;align-items:center;color:var(--text);}.header-text{flex:1;}
 .header-text h1{font-size:16px;font-weight:700;letter-spacing:-0.3px;}
 #sync-status{font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid var(--border);color:var(--muted);transition:all 0.3s;}
 #sync-status.synced{color:var(--accent);border-color:var(--accent);}
@@ -116,8 +116,9 @@ header{display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:ca
 .btn-circle:hover{background:var(--surface2);}
 #mic-btn.rec{background:rgba(255,69,58,0.15);border-color:var(--danger);color:var(--danger);animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-#send-btn{background:var(--accent);border:none;color:#000;border-radius:50%;padding:0;cursor:pointer;height:42px;width:42px;flex-shrink:0;transition:opacity 0.2s;display:flex;align-items:center;justify-content:center;}
-#send-btn:hover{opacity:0.85;}
+#send-btn{background:rgba(255,255,255,0.13);border:1px solid rgba(255,255,255,0.18);color:var(--text);border-radius:50%;padding:0;cursor:pointer;height:42px;width:42px;flex-shrink:0;transition:opacity 0.2s;display:flex;align-items:center;justify-content:center;}
+[data-theme=light] #send-btn{background:rgba(0,0,0,0.07);border-color:rgba(0,0,0,0.12);}
+#send-btn:hover{opacity:0.75;}
 #toast{display:none;position:fixed;top:62px;left:50%;transform:translateX(-50%);background:rgba(44,44,46,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border2);border-radius:16px;padding:10px 14px 10px 18px;font-size:13px;color:var(--text);line-height:1.5;max-width:88vw;align-items:flex-start;gap:10px;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,0.6);}
 [data-theme=light] #toast{background:rgba(255,255,255,0.95);color:#000;}
 #toast.show{display:flex;animation:toastIn 0.2s ease;}
@@ -131,20 +132,42 @@ header{display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:ca
 .cat-group.dragging{opacity:0.3;}
 .drag-ghost{position:fixed;z-index:500;opacity:0.9;pointer-events:none;background:var(--surface2);border:1px solid var(--accent);border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,0.5);}
 #tab-bar{display:none;}
-.ci{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:0;}
+.ci{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;font-size:9px;font-weight:700;color:var(--muted);background:var(--surface3);flex-shrink:0;letter-spacing:0;}
 #cat-picker{display:none;position:fixed;z-index:300;background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:8px;min-width:180px;max-height:320px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.4);}
 [data-theme=light] #cat-picker{box-shadow:0 4px 16px rgba(0,0,0,0.12);}
 #cat-picker.open{display:flex;flex-direction:column;gap:2px;animation:toastIn 0.15s ease;}
 .cat-pick-item{background:none;border:none;color:var(--text);font-family:inherit;font-size:13px;padding:8px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;text-align:right;}
 .cat-pick-item:hover,.cat-pick-item.current{background:var(--accent-dim);color:var(--accent);}
 @media(max-width:640px){
-  .body{flex-direction:column-reverse;}
-  #list-panel{width:100%;flex:1;border-left:none;border-bottom:1px solid var(--border);}
+  .body{flex-direction:column;}
+  #list-panel{width:100%;flex:1;border-left:none;border-bottom:none;}
+  #items-scroll{padding-bottom:calc(72px + max(8px,env(safe-area-inset-bottom)));}
   #messages,#typing,#hints{display:none;}
-  #chat-panel{flex:0 0 auto;background:transparent;padding-bottom:max(20px,env(safe-area-inset-bottom));}
-  #input-row{margin:8px 12px 0;padding:6px 6px 6px 10px;border-top:none;border-radius:30px;background:var(--surface);box-shadow:0 2px 20px rgba(0,0,0,0.18),0 0 0 1px var(--border);align-items:center;}
-  [data-theme=light] #input-row{box-shadow:0 2px 20px rgba(0,0,0,0.08),0 0 0 1px var(--border);}
-  #input-row:focus-within{box-shadow:0 0 0 2px var(--accent),0 2px 20px rgba(0,0,0,0.18);}
+  #chat-panel{
+    position:fixed;left:14px;right:14px;
+    bottom:max(8px,env(safe-area-inset-bottom));
+    z-index:100;background:transparent;padding:0;
+    display:flex;flex-direction:column;
+  }
+  #input-row{
+    margin:0;padding:7px 7px 7px 12px;
+    border-top:none;border-radius:30px;
+    background:rgba(18,18,20,0.74);
+    backdrop-filter:blur(32px) saturate(1.8);
+    -webkit-backdrop-filter:blur(32px) saturate(1.8);
+    box-shadow:0 0 0 0.5px rgba(255,255,255,0.14),0 10px 44px rgba(0,0,0,0.46);
+    align-items:center;
+  }
+  [data-theme=light] #input-row{
+    background:rgba(248,248,250,0.8);
+    box-shadow:0 0 0 0.5px rgba(0,0,0,0.1),0 6px 32px rgba(0,0,0,0.1);
+  }
+  #input-row:focus-within{
+    box-shadow:0 0 0 1.5px rgba(255,255,255,0.28),0 10px 44px rgba(0,0,0,0.46);
+  }
+  [data-theme=light] #input-row:focus-within{
+    box-shadow:0 0 0 1.5px rgba(0,0,0,0.18),0 6px 32px rgba(0,0,0,0.12);
+  }
   #input-wrap{background:transparent;border-color:transparent;padding:8px 6px;}
   .btn-circle{width:44px;height:44px;font-size:20px;border:none;background:none;}
   #send-btn{height:44px;width:44px;}
@@ -328,16 +351,16 @@ initApp();
 
 // ── Render ────────────────────────────────────────────────
 const CAT_ICONS = {
-  'ירקות ופירות': '<span class="ci" style="background:#30d158">יר</span>',
-  'מאפייה': '<span class="ci" style="background:#ff9f0a">מא</span>',
-  'חלב וביצים': '<span class="ci" style="background:#5ac8fa">חל</span>',
-  'בשר ודגים': '<span class="ci" style="background:#ff453a">בש</span>',
-  'מוצרי ניקיון': '<span class="ci" style="background:#0a84ff">נק</span>',
-  'שימורים ויבשים': '<span class="ci" style="background:#a2845e">שמ</span>',
-  'משקאות': '<span class="ci" style="background:#5e5ce6">מש</span>',
-  'קפואים': '<span class="ci" style="background:#32ade6">קפ</span>',
-  'ממתקים וחטיפים': '<span class="ci" style="background:#ff375f">ממ</span>',
-  'אחר': '<span class="ci" style="background:#8e8e93">+</span>',
+  'ירקות ופירות': '<span class="ci">יר</span>',
+  'מאפייה': '<span class="ci">מא</span>',
+  'חלב וביצים': '<span class="ci">חל</span>',
+  'בשר ודגים': '<span class="ci">בש</span>',
+  'מוצרי ניקיון': '<span class="ci">נק</span>',
+  'שימורים ויבשים': '<span class="ci">שמ</span>',
+  'משקאות': '<span class="ci">מש</span>',
+  'קפואים': '<span class="ci">קפ</span>',
+  'ממתקים וחטיפים': '<span class="ci">ממ</span>',
+  'אחר': '<span class="ci">+</span>',
 };
 
 function render() {
