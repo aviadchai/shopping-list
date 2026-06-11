@@ -142,7 +142,7 @@ header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgb
   .btn-circle{width:44px;height:44px;font-size:20px;}
   .item-name{font-size:15px;}
   .cat-label{padding:8px 16px;}
-  #input-row{padding-bottom:calc(20px + env(safe-area-inset-bottom));}
+  #input-row{padding-bottom:calc(4px + env(safe-area-inset-bottom));}
 }
 ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 </style>
@@ -207,6 +207,7 @@ header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgb
   </div>
 </div>
 
+<div id="cat-picker"></div>
 <div id="toast"></div>
 <div id="item-popup">
   <button class="popup-close" onclick="closePopup()">×</button>
@@ -393,6 +394,7 @@ function render() {
               <span class="item-name ${it.done?'done':''}">${esc(it.name)}</span>
               ${it.note ? `<span class="item-note">· ${esc(it.note)}</span>` : ''}
             </div>
+            <button class="cat-chip" onclick="openCatPicker('${it.id}',this,event)">${CAT_ICONS[it.category||'אחר']||'🛒'}</button>
             ${qtyHtml}
             ${(it.fun_fact||it.health_note) ? `<button class="info-btn${it.health?' active':''}" onclick="showInfoPopup('${it.id}',this)" title="מידע">i</button>` : ''}
             <button class="del-btn" onclick="delItem('${it.id}')">×</button>
@@ -506,6 +508,42 @@ function startCatDrag(e) {
   document.addEventListener('pointermove', onMove);
   document.addEventListener('pointerup', onUp);
 }
+
+
+// ── Category picker ───────────────────────────────────────
+const CATS = ['ירקות ופירות','מאפייה','חלב וביצים','בשר ודגים','מוצרי ניקיון','שימורים ויבשים','משקאות','קפואים','ממתקים וחטיפים','אחר'];
+let _catTarget = null;
+
+function openCatPicker(id, btn, e) {
+  e.stopPropagation();
+  const it = items.find(i => i.id === id);
+  if (!it) return;
+  _catTarget = id;
+  const picker = document.getElementById('cat-picker');
+  picker.innerHTML = CATS.map(c =>
+    `<button class="cat-pick-item${c===it.category?' current':''}" onclick="pickCat('${c}')">${CAT_ICONS[c]||'🛒'} ${c}</button>`
+  ).join('');
+  const r = btn.getBoundingClientRect();
+  let top = r.bottom + 6;
+  if (top + 320 > window.innerHeight) top = r.top - 326;
+  let left = r.left - 100;
+  left = Math.max(8, Math.min(left, window.innerWidth - 196));
+  picker.style.top = top + 'px';
+  picker.style.left = left + 'px';
+  picker.classList.add('open');
+}
+
+function pickCat(cat) {
+  const it = items.find(i => i.id === _catTarget);
+  if (it) { it.category = cat; persistItems(); render(); }
+  document.getElementById('cat-picker').classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#cat-picker') && !e.target.closest('.cat-chip')) {
+    document.getElementById('cat-picker')?.classList.remove('open');
+  }
+});
 
 // ── Confetti ──────────────────────────────────────────────
 function launchConfetti(labelEl) {
