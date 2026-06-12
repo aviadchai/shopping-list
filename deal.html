@@ -208,6 +208,27 @@ html,body{height:100%;height:100dvh;font-family:Roboto,system-ui,-apple-system,s
 .no-deal p{font-size:16px;color:var(--label2);line-height:1.6;}
 canvas.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
 ::-webkit-scrollbar{width:0;}
+
+/* FAB */
+.fab{position:fixed;bottom:calc(96px + var(--safe-bottom));left:50%;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(77,182,172,0.55),0 2px 8px rgba(0,0,0,0.4);z-index:50;transition:transform 0.15s,box-shadow 0.15s;}
+.fab.show{display:flex;}
+.fab:active{transform:translateX(-50%) scale(0.88);box-shadow:0 2px 8px rgba(77,182,172,0.35);}
+.fab svg{width:28px;height:28px;stroke:#003731;fill:none;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round;}
+
+/* Exercise picker */
+.exercise-cards-row{display:flex;gap:8px;width:100%;}
+.exercise-card{flex:1;background:var(--bg2);border:2px solid transparent;border-radius:14px;padding:12px 6px;cursor:pointer;text-align:center;transition:all 0.18s;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.exercise-card.selected{border-color:var(--accent);background:var(--accent-cont);}
+.ec-ring{width:44px;height:44px;border-radius:50%;background:rgba(77,182,172,0.1);display:flex;align-items:center;justify-content:center;}
+.ec-ring svg{width:22px;height:22px;fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.ec-name{font-size:12px;font-weight:600;line-height:1.3;}
+
+/* Camera preview in log sheet */
+.camera-preview{width:100%;border-radius:14px;object-fit:cover;display:none;background:#000;transform:scaleX(-1);aspect-ratio:4/3;max-height:200px;}
+.log-header-row{display:flex;align-items:center;justify-content:space-between;width:100%;}
+.camera-btn{background:none;border:none;padding:6px;cursor:pointer;color:var(--label3);border-radius:8px;transition:color 0.18s;}
+.camera-btn.on{color:var(--accent);}
+.camera-btn svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
 </style>
 </head>
 <body>
@@ -235,13 +256,28 @@ canvas.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
     <div class="ob-icon-ring">
       <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
     </div>
-    <h2 class="ob-title">כמה שכיבות סמיכה<br>כל יום?</h2>
+    <h2 class="ob-title">בחר אתגר</h2>
+    <div class="exercise-cards-row">
+      <div class="exercise-card selected" data-ex="pushups" onclick="selectExercise('pushups')">
+        <div class="ec-ring"><svg viewBox="0 0 24 24"><path d="M18 3a3 3 0 00-3 3v12a3 3 0 003 3 3 3 0 003-3 3 3 0 00-3-3H6a3 3 0 00-3 3 3 3 0 003 3 3 3 0 003-3V6a3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3h12a3 3 0 003-3 3 3 0 00-3-3z"/></svg></div>
+        <div class="ec-name">שכיבות סמיכה</div>
+      </div>
+      <div class="exercise-card" data-ex="situps" onclick="selectExercise('situps')">
+        <div class="ec-ring"><svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 110 4 2 2 0 010-4zM4 18l4-8 2 4 3-4 5 8"/></svg></div>
+        <div class="ec-name">כפיפות בטן</div>
+      </div>
+      <div class="exercise-card" data-ex="plank" onclick="selectExercise('plank')">
+        <div class="ec-ring"><svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 110 4 2 2 0 010-4zM3 18l18-8"/></svg></div>
+        <div class="ec-name">פלאנקים</div>
+      </div>
+    </div>
+    <p class="ob-body" style="font-size:14px">כמה <span id="target-unit">חזרות</span> ביום?</p>
     <div class="target-row">
       <button class="qty-btn" onclick="changeTarget(-5)">−</button>
       <div id="target-display">25</div>
       <button class="qty-btn" onclick="changeTarget(5)">+</button>
     </div>
-    <p class="ob-body" style="font-size:13px">מומלץ להתחיל ריאליסטי — אפשר תמיד להגדיל</p>
+    <p class="ob-body" style="font-size:12px">מומלץ להתחיל ריאליסטי</p>
     <div class="ob-dots">
       <div class="ob-dot"></div><div class="ob-dot on"></div><div class="ob-dot"></div>
     </div>
@@ -282,7 +318,7 @@ canvas.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
     </div>
     <h2 class="ob-title">הדיל שלך</h2>
     <div id="deal-summary">
-      <div class="summary-row"><span class="summary-key">תרגיל</span><span class="summary-val">שכיבות סמיכה 💪</span></div>
+      <div class="summary-row"><span class="summary-key">תרגיל</span><span id="sum-exercise" class="summary-val">שכיבות סמיכה</span></div>
       <div class="summary-row"><span class="summary-key">יעד יומי</span><span id="sum-target" class="summary-val">25 חזרות</span></div>
       <div class="summary-row"><span class="summary-key">קנס</span><span id="sum-penalty" class="summary-val">כפול ×2</span></div>
       <div class="summary-row"><span class="summary-key">מתחיל</span><span class="summary-val">מחר בבוקר</span></div>
@@ -299,9 +335,6 @@ canvas.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
   <div class="s-header">
     <h2>דיל כושר</h2>
     <span id="streak-badge" style="font-size:13px;color:var(--label2);display:none"></span>
-    <button class="icon-btn" onclick="show('log')" id="log-fab" style="display:none">
-      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </button>
   </div>
   <div class="main-body" id="main-body"></div>
 </div>
@@ -310,8 +343,16 @@ canvas.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
 <div id="s-log" class="screen" onclick="handleLogBg(event)">
   <div class="log-sheet">
     <div class="sheet-handle"></div>
-    <div class="log-title">רישום אימון</div>
-    <div class="log-sub" id="log-sub">כמה שכיבות עשית?</div>
+    <div class="log-header-row">
+      <div>
+        <div class="log-title">רישום אימון</div>
+        <div class="log-sub" id="log-sub">יעד היום: 25</div>
+      </div>
+      <button class="camera-btn" id="camera-btn" onclick="toggleCamera()" title="מצלמה">
+        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </button>
+    </div>
+    <video id="camera-preview" class="camera-preview" autoplay playsinline muted></video>
     <div class="reps-controls">
       <button class="reps-btn" onclick="changeReps(-5)">−</button>
       <div class="reps-display" id="reps-display">0</div>
@@ -324,7 +365,7 @@ canvas.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
     </div>
     <div class="log-actions">
       <button class="btn-primary" onclick="saveLog()">שמור</button>
-      <button class="btn-text-cancel" onclick="show('main')">ביטול</button>
+      <button class="btn-text-cancel" onclick="closeLog()">ביטול</button>
     </div>
   </div>
 </div>
@@ -374,6 +415,10 @@ canvas.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
     הגדרות
   </button>
 </nav>
+
+<button id="fab" class="fab" onclick="fabAction()">
+  <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</button>
 
 <div id="toast"></div>
 
@@ -525,6 +570,7 @@ function getDebtRepaid() {
 let currentScreen = 'ob';
 
 function show(name) {
+  if (currentScreen === 'log' && name !== 'log') stopCamera();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const el = document.getElementById('s-' + name);
@@ -533,17 +579,89 @@ function show(name) {
   if (nb) nb.classList.add('active');
   currentScreen = name;
 
-  if (name === 'main') renderMain();
+  if (name === 'main') { renderMain(); updateFab(); }
   if (name === 'cal') renderCalendar();
   if (name === 'stat') renderStats();
   if (name === 'set') renderSettings();
   if (name === 'log') renderLog();
 }
 
+// ═══════════════ EXERCISES ═══════════════
+const EXERCISES = {
+  pushups: { name: 'שכיבות סמיכה', unit: 'חזרות', defaultTarget: 25 },
+  situps:  { name: 'כפיפות בטן',   unit: 'חזרות', defaultTarget: 20 },
+  plank:   { name: 'פלאנקים',      unit: 'שניות', defaultTarget: 60 },
+};
+function exName() { return EXERCISES[DATA.deal?.exercise || 'pushups']?.name || 'שכיבות סמיכה'; }
+function exUnit() { return EXERCISES[DATA.deal?.exercise || 'pushups']?.unit || 'חזרות'; }
+
+// ═══════════════ FAB ═══════════════
+function updateFab() {
+  const fab = document.getElementById('fab');
+  if (!fab) return;
+  if (!DATA.deal?.active) {
+    fab.classList.add('show');
+    fab.title = 'דיל חדש';
+  } else if (todayStr() < DATA.deal.startDate) {
+    fab.classList.remove('show');
+  } else {
+    fab.classList.add('show');
+    fab.title = 'רשום אימון';
+  }
+}
+function fabAction() {
+  if (!DATA.deal?.active) { obStep = 0; show('ob'); }
+  else show('log');
+}
+
+// ═══════════════ CAMERA ═══════════════
+let cameraStream = null;
+async function toggleCamera() {
+  const vid = document.getElementById('camera-preview');
+  const btn = document.getElementById('camera-btn');
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+    vid.style.display = 'none';
+    btn.classList.remove('on');
+  } else {
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      vid.srcObject = cameraStream;
+      vid.style.display = 'block';
+      btn.classList.add('on');
+    } catch { showToast('מצלמה לא זמינה'); }
+  }
+}
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+  const vid = document.getElementById('camera-preview');
+  if (vid) { vid.style.display = 'none'; vid.srcObject = null; }
+  const btn = document.getElementById('camera-btn');
+  if (btn) btn.classList.remove('on');
+}
+function closeLog() {
+  stopCamera();
+  show('main');
+}
+
 // ═══════════════ ONBOARDING ═══════════════
 let obStep = 0;
 let obTarget = 25;
 let obPenalty = 'double';
+let obExercise = 'pushups';
+
+function selectExercise(type) {
+  obExercise = type;
+  document.querySelectorAll('.exercise-card').forEach(c =>
+    c.classList.toggle('selected', c.dataset.ex === type));
+  obTarget = EXERCISES[type].defaultTarget;
+  document.getElementById('target-display').textContent = obTarget;
+  document.getElementById('target-unit').textContent = EXERCISES[type].unit;
+}
 
 function obNext() {
   document.getElementById('ob-step-' + obStep).classList.remove('active');
@@ -574,7 +692,9 @@ function selectPenalty(type) {
 }
 
 function updateSummary() {
-  document.getElementById('sum-target').textContent = obTarget + ' חזרות';
+  const ex = EXERCISES[obExercise];
+  document.getElementById('sum-exercise').textContent = ex.name;
+  document.getElementById('sum-target').textContent = obTarget + ' ' + ex.unit;
   if (obPenalty === 'double') {
     document.getElementById('sum-penalty').textContent = 'כפול ×2';
   } else {
@@ -586,12 +706,12 @@ function updateSummary() {
 function signDeal() {
   const btn = document.getElementById('sign-btn');
   btn.style.transform = 'scale(1.15)';
-  btn.textContent = '✅';
+  btn.style.background = 'var(--green)';
   setTimeout(() => {
     const pct = parseInt(document.getElementById('pct-input').value) || 20;
     const tomorrow = addDays(todayStr(), 1);
     DATA.deal = {
-      exercise: 'pushups',
+      exercise: obExercise,
       dailyTarget: obTarget,
       penaltyType: obPenalty,
       penaltyPercent: pct,
@@ -622,7 +742,6 @@ async function requestNotifications() {
 function renderMain() {
   processDebt();
   const body = document.getElementById('main-body');
-  const fab = document.getElementById('log-fab');
   const streakBadge = document.getElementById('streak-badge');
 
   if (!DATA.deal?.active) {
@@ -630,16 +749,12 @@ function renderMain() {
       <div class="icon-ring"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
       <p>אין דיל פעיל.<br>לחץ + כדי להתחיל.</p>
     </div>`;
-    fab.style.display = 'flex';
-    fab.onclick = () => { obStep = 0; show('ob'); };
     return;
   }
 
-  fab.style.display = 'flex';
-  fab.onclick = () => show('log');
-
   if (todayStr() < DATA.deal.startDate) {
     const startFmt = formatDate(DATA.deal.startDate);
+    const ex = EXERCISES[DATA.deal.exercise] || EXERCISES.pushups;
     body.innerHTML = `
       <div class="start-card">
         <div class="start-icon-ring"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
@@ -647,9 +762,10 @@ function renderMain() {
         <div class="start-sub">האימון הראשון מתחיל<br><strong>${startFmt}</strong></div>
       </div>
       <div class="start-card" style="gap:6px;align-items:flex-start;">
-        <div style="font-size:13px;color:var(--label3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">הדיל שלך</div>
-        <div style="display:flex;justify-content:space-between;width:100%;font-size:15px;padding:4px 0;border-bottom:0.5px solid var(--sep)"><span style="color:var(--label2)">יעד יומי</span><span style="font-weight:600">${DATA.deal.dailyTarget} חזרות</span></div>
-        <div style="display:flex;justify-content:space-between;width:100%;font-size:15px;padding:4px 0"><span style="color:var(--label2)">קנס</span><span style="font-weight:600">${DATA.deal.penaltyType==='double'?'כפול ×2':'ריבית '+DATA.deal.penaltyPercent+'%'}</span></div>
+        <div style="font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;font-weight:500;margin-bottom:4px">הדיל שלך</div>
+        <div style="display:flex;justify-content:space-between;width:100%;font-size:15px;padding:6px 0;border-bottom:1px solid var(--sep)"><span style="color:var(--label2)">תרגיל</span><span style="font-weight:600">${ex.name}</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;font-size:15px;padding:6px 0;border-bottom:1px solid var(--sep)"><span style="color:var(--label2)">יעד יומי</span><span style="font-weight:600">${DATA.deal.dailyTarget} ${ex.unit}</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;font-size:15px;padding:6px 0"><span style="color:var(--label2)">קנס</span><span style="font-weight:600">${DATA.deal.penaltyType==='double'?'כפול ×2':'ריבית '+DATA.deal.penaltyPercent+'%'}</span></div>
       </div>`;
     streakBadge.style.display = 'none';
     return;
@@ -676,16 +792,17 @@ function renderMain() {
   const ringColor = done ? 'var(--green)' : debt > 0 ? 'var(--orange)' : 'var(--accent)';
   const numClass = done ? 'r-done' : '';
 
+  const unit = exUnit();
   let chipsHtml = `<div class="chips-row">
     <div class="chip"><div class="chip-val">${target}</div><div class="chip-key">יעד</div></div>`;
   if (debt > 0) chipsHtml += `<div class="chip c-debt"><div class="chip-val">${debt}</div><div class="chip-key">חוב</div></div>`;
-  chipsHtml += `<div class="chip c-done"><div class="chip-val">${logged}</div><div class="chip-key">הושלמו</div></div></div>`;
+  chipsHtml += `<div class="chip c-done"><div class="chip-val">${logged}</div><div class="chip-key">${unit}</div></div></div>`;
 
   let capHtml = '';
   if (DATA.debtOverCap) {
     capHtml = `<div class="cap-card">
-      <div class="cap-title">⚠️ תקרת חוב</div>
-      <div class="cap-body">החוב הגיע לגבול (${target*5} חזרות). ניתן לפרוס אותו על פני כמה ימים.</div>
+      <div class="cap-title">תקרת חוב הגיעה</div>
+      <div class="cap-body">החוב הגיע לגבול (${target*5} ${unit}). ניתן לפרוס אותו על פני כמה ימים.</div>
       <button class="cap-btn" onclick="showSettle()">הסדר חוב</button>
     </div>`;
   }
@@ -717,11 +834,11 @@ let currentReps = 0;
 function renderLog() {
   currentReps = 0;
   document.getElementById('reps-display').textContent = '0';
-  const target = DATA.deal?.dailyTarget || 25;
   const logged = todayLogged();
   const due = totalDue();
+  const unit = exUnit();
   document.getElementById('log-sub').textContent =
-    logged > 0 ? `כבר רשמת ${logged} — עוד ${Math.max(0, due - logged)} לסגירה` : `יעד היום: ${due}`;
+    logged > 0 ? `כבר רשמת ${logged} — עוד ${Math.max(0, due - logged)} ${unit}` : `יעד היום: ${due} ${unit}`;
   document.getElementById('log-all-btn').textContent =
     due > 0 ? `כל היעד (${due})` : 'כל היעד';
 }
@@ -737,21 +854,18 @@ function logAll() {
 }
 
 function handleLogBg(e) {
-  if (e.target === document.getElementById('s-log')) show('main');
+  if (e.target === document.getElementById('s-log')) closeLog();
 }
 
 function saveLog() {
-  if (currentReps <= 0) { showToast('הכנס כמות חזרות'); return; }
+  if (currentReps <= 0) { showToast('הכנס כמות'); return; }
   addLog(currentReps);
   const todayDone = isTodayDone();
-  show('main');
+  closeLog();
   if (todayDone) {
-    setTimeout(() => {
-      launchConfetti();
-      showToast('🎉 הדיל הושלם היום!');
-    }, 200);
+    setTimeout(() => { launchConfetti(); showToast('הדיל הושלם היום!'); }, 200);
   } else {
-    showToast(`✓ נרשמו ${currentReps} חזרות`);
+    showToast(`נרשמו ${currentReps} ${exUnit()}`);
   }
 }
 
@@ -759,7 +873,7 @@ function saveLog() {
 function renderCalendar() {
   const container = document.getElementById('cal-container');
   if (!DATA.deal?.active) {
-    container.innerHTML = '<div class="no-deal"><div class="icon">📅</div><p>אין דיל פעיל</p></div>';
+    container.innerHTML = '<div class="no-deal"><div class="icon-ring"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><p>אין דיל פעיל</p></div>';
     return;
   }
 
@@ -816,7 +930,7 @@ function renderCalendar() {
 function renderStats() {
   const body = document.getElementById('stat-body');
   if (!DATA.deal?.active) {
-    body.innerHTML = '<div class="no-deal"><div class="icon">📊</div><p>אין דיל פעיל</p></div>';
+    body.innerHTML = '<div class="no-deal"><div class="icon-ring"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><p>אין דיל פעיל</p></div>';
     return;
   }
 
@@ -1060,10 +1174,12 @@ function init() {
     processDebt();
     document.getElementById('nav').classList.add('show');
     show('main');
+    updateFab();
     checkNotifications();
   } else {
     obStep = 0;
     show('ob');
+    document.getElementById('fab').classList.add('show');
   }
 }
 
