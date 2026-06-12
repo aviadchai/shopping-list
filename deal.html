@@ -142,7 +142,7 @@ html,body{height:100%;height:100dvh;font-family:system-ui,-apple-system,'Segoe U
 
 /* ── Log screen (overlay) ── */
 #s-log{background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
-  justify-content:flex-end;align-items:center;}
+  justify-content:flex-end;align-items:center;z-index:110;}
 .log-sheet{background:var(--surface);border-radius:24px 24px 0 0;
   padding:24px 24px calc(24px + var(--safe-bottom));width:100%;max-width:480px;
   display:flex;flex-direction:column;align-items:center;gap:20px;}
@@ -355,8 +355,8 @@ canvas.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
       <button class="reps-btn" onclick="changeReps(5)">+</button>
     </div>
     <div style="display:flex;gap:8px;width:100%;">
-      <button class="btn-outline" style="font-size:12px;padding:10px" onclick="changeReps(-1)">−1</button>
-      <button class="btn-outline" style="font-size:12px;padding:10px" onclick="changeReps(1)">+1</button>
+      <button id="log-minus1" class="btn-outline" style="font-size:12px;padding:10px" onclick="changeReps(-1)">−1</button>
+      <button id="log-plus1" class="btn-outline" style="font-size:12px;padding:10px" onclick="changeReps(1)">+1</button>
       <button class="btn-outline" style="font-size:12px;padding:10px;flex:2" id="log-all-btn" onclick="logAll()">כל היעד</button>
     </div>
     <div class="log-actions">
@@ -480,9 +480,9 @@ function processDebt() {
     cursor = addDays(cursor, 1);
   }
 
-  // Debt cap: max 5× target
+  // Debt cap: max 5× target — use >= so flag persists after debt is clamped
   const cap = dailyTarget * 5;
-  DATA.debtOverCap = DATA.debt > cap;
+  DATA.debtOverCap = DATA.debt >= cap;
   DATA.debt = Math.min(DATA.debt, cap);
   DATA.lastProcessed = addDays(tod, -1);
   save();
@@ -641,11 +641,9 @@ function signDeal() {
     DATA.lastProcessed = todayStr();
     save();
     launchConfetti();
-    setTimeout(requestNotifications, 800);
-    setTimeout(() => {
-      document.getElementById('nav').classList.add('show');
-      show('main');
-    }, 1400);
+    document.getElementById('nav').classList.add('show');
+    show('main');
+    setTimeout(requestNotifications, 500);
   }, 600);
 }
 
@@ -676,6 +674,19 @@ function renderMain() {
 
   fab.style.display = 'flex';
   fab.onclick = () => show('log');
+
+  // Deal hasn't started yet (signed today, starts tomorrow)
+  if (todayStr() < DATA.deal.startDate) {
+    const startFmt = formatDate(DATA.deal.startDate);
+    body.innerHTML = `
+      <div class="deal-card" style="text-align:center;gap:10px;align-items:center;">
+        <div style="font-size:48px">🤝</div>
+        <div style="font-size:18px;font-weight:700">הדיל הושלם!</div>
+        <div style="font-size:14px;color:var(--muted)">האימון הראשון מתחיל<br><strong style="color:var(--text)">${startFmt}</strong></div>
+      </div>`;
+    streakBadge.style.display = 'none';
+    return;
+  }
 
   const target = DATA.deal.dailyTarget;
   const logged = todayLogged();
