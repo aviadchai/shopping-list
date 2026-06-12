@@ -10,244 +10,197 @@
 <meta name="apple-mobile-web-app-title" content="דיל כושר">
 <style>
 :root {
-  --bg:#000;--surface:#1c1c1e;--surface2:#2c2c2e;--surface3:#3a3a3c;
-  --border:rgba(255,255,255,0.09);--border2:rgba(255,255,255,0.15);
-  --accent:#6366f1;--accent-dim:rgba(99,102,241,0.15);
-  --green:#30d158;--green-dim:rgba(48,209,88,0.15);
-  --orange:#ff9f0a;--orange-dim:rgba(255,159,10,0.15);
-  --red:#ff453a;--red-dim:rgba(255,69,58,0.15);
-  --text:#fff;--muted:#8e8e93;
+  --bg:#000;--bg2:#1c1c1e;--bg3:#2c2c2e;--bg4:#3a3a3c;
+  --label:#fff;--label2:rgba(235,235,245,0.6);--label3:rgba(235,235,245,0.3);
+  --sep:rgba(84,84,88,0.65);--fill:rgba(120,120,128,0.2);
+  --accent:#0a84ff;--green:#30d158;--orange:#ff9f0a;--red:#ff453a;
   --safe-top:env(safe-area-inset-top);--safe-bottom:env(safe-area-inset-bottom);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;height:100dvh;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;}
+html,body{height:100%;height:100dvh;font-family:system-ui,-apple-system,'SF Pro Text',sans-serif;background:var(--bg);color:var(--label);overflow:hidden;font-variant-numeric:tabular-nums;}
 #app{display:flex;flex-direction:column;height:100dvh;position:relative;}
 
-/* ── Screens ── */
-.screen{position:absolute;inset:0;display:flex;flex-direction:column;
-  opacity:0;pointer-events:none;transition:opacity 0.22s ease;overflow:hidden;}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 0.2s ease;overflow:hidden;}
 .screen.active{opacity:1;pointer-events:all;}
 
-/* ── Nav bar ── */
-#nav{display:none;position:fixed;bottom:0;left:0;right:0;
-  background:rgba(28,28,30,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-top:1px solid var(--border);
-  padding:8px 0 calc(8px + var(--safe-bottom));
-  flex-direction:row;z-index:100;}
+/* Nav — Apple tab bar */
+#nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(28,28,30,0.94);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-top:0.5px solid var(--sep);padding:8px 0 calc(10px + var(--safe-bottom));flex-direction:row;z-index:100;}
 #nav.show{display:flex;}
-.nav-btn{flex:1;background:none;border:none;cursor:pointer;color:var(--muted);
-  font-family:inherit;font-size:10px;display:flex;flex-direction:column;
-  align-items:center;gap:3px;padding:4px 0;transition:color 0.15s;}
-.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;
-  stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.nav-btn{flex:1;background:none;border:none;cursor:pointer;color:var(--label3);font-family:inherit;font-size:10px;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;transition:color 0.15s;letter-spacing:0.01em;}
+.nav-btn svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
 .nav-btn.active{color:var(--accent);}
 
-/* ── Onboarding ── */
+/* Screen header — frosted glass */
+.s-header{display:flex;align-items:center;gap:12px;padding:0 20px;padding-top:calc(12px + var(--safe-top));padding-bottom:12px;background:rgba(0,0,0,0.6);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:0.5px solid var(--sep);flex-shrink:0;}
+.s-header h2{font-size:17px;font-weight:600;flex:1;}
+.icon-btn{background:none;border:none;cursor:pointer;color:var(--label2);padding:4px;display:flex;align-items:center;justify-content:center;border-radius:8px;}
+.icon-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.icon-btn:active{background:var(--fill);}
+
+/* Onboarding */
 #s-ob{background:var(--bg);justify-content:center;align-items:center;}
-.ob-step{display:none;flex-direction:column;align-items:center;
-  padding:32px 28px;width:100%;max-width:380px;text-align:center;gap:20px;}
+.ob-step{display:none;flex-direction:column;align-items:center;padding:40px 28px;width:100%;max-width:380px;text-align:center;gap:18px;}
 .ob-step.active{display:flex;}
-.ob-icon{font-size:64px;line-height:1;}
-.ob-title{font-size:26px;font-weight:700;letter-spacing:-0.5px;line-height:1.25;}
-.ob-body{font-size:15px;color:var(--muted);line-height:1.65;}
-.ob-body strong{color:var(--text);}
-.ob-dots{display:flex;gap:6px;justify-content:center;}
-.ob-dot{width:6px;height:6px;border-radius:50%;background:var(--surface3);}
+.ob-icon{font-size:72px;line-height:1;margin-bottom:4px;}
+.ob-title{font-size:28px;font-weight:700;letter-spacing:-0.6px;line-height:1.2;}
+.ob-body{font-size:15px;color:var(--label2);line-height:1.7;}
+.ob-body strong{color:var(--label);}
+.ob-dots{display:flex;gap:7px;justify-content:center;}
+.ob-dot{width:7px;height:7px;border-radius:50%;background:var(--bg4);transition:background 0.2s;}
 .ob-dot.on{background:var(--accent);}
 
-/* Target picker */
-.target-row{display:flex;align-items:center;gap:20px;margin:8px 0;}
-.qty-btn{width:52px;height:52px;border-radius:50%;border:1.5px solid var(--border2);
-  background:var(--surface);color:var(--text);font-size:26px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
-.qty-btn:active{transform:scale(0.92);}
-#target-display{font-size:56px;font-weight:700;letter-spacing:-2px;min-width:90px;text-align:center;}
+.target-row{display:flex;align-items:center;gap:28px;margin:4px 0;}
+.qty-btn{width:56px;height:56px;border-radius:50%;background:var(--bg2);border:none;color:var(--label);font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.12s;}
+.qty-btn:active{background:var(--bg3);transform:scale(0.92);}
+#target-display{font-size:64px;font-weight:700;letter-spacing:-3px;min-width:90px;text-align:center;}
 
-/* Penalty cards */
-.penalty-cards{display:flex;flex-direction:column;gap:12px;width:100%;}
-.penalty-card{background:var(--surface);border:1.5px solid var(--border2);border-radius:16px;
-  padding:16px 18px;cursor:pointer;text-align:right;transition:all 0.18s;}
-.penalty-card.selected{border-color:var(--accent);background:var(--accent-dim);}
+.penalty-cards{display:flex;flex-direction:column;gap:10px;width:100%;}
+.penalty-card{background:var(--bg2);border-radius:16px;padding:16px 18px;cursor:pointer;text-align:right;transition:all 0.18s;border:2px solid transparent;}
+.penalty-card.selected{border-color:var(--accent);background:rgba(10,132,255,0.1);}
 .penalty-card h3{font-size:16px;font-weight:600;margin-bottom:4px;}
-.penalty-card p{font-size:13px;color:var(--muted);line-height:1.5;}
-.pct-row{display:flex;align-items:center;gap:12px;width:100%;margin-top:4px;}
-.pct-row label{font-size:13px;color:var(--muted);flex-shrink:0;}
-#pct-input{flex:1;background:var(--surface2);border:1px solid var(--border2);
-  border-radius:10px;color:var(--text);font-size:16px;font-family:inherit;
-  padding:8px 12px;outline:none;text-align:center;max-width:90px;}
+.penalty-card p{font-size:13px;color:var(--label2);line-height:1.5;}
+.pct-row{display:flex;align-items:center;gap:12px;width:100%;margin-top:8px;}
+.pct-row label{font-size:13px;color:var(--label2);flex-shrink:0;}
+#pct-input{flex:1;background:var(--bg3);border:none;border-radius:10px;color:var(--label);font-size:16px;font-family:inherit;padding:8px 12px;outline:none;text-align:center;max-width:90px;}
 
-/* Sign screen */
-.sign-btn{width:140px;height:140px;border-radius:50%;background:var(--accent);
-  border:none;cursor:pointer;font-size:52px;display:flex;align-items:center;
-  justify-content:center;box-shadow:0 8px 40px rgba(99,102,241,0.5);
-  transition:all 0.2s;color:#fff;}
-.sign-btn:active{transform:scale(0.94);}
+.sign-btn{width:150px;height:150px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;font-size:56px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(10,132,255,0.4),0 8px 30px rgba(10,132,255,0.3);transition:all 0.2s;}
+.sign-btn:active{transform:scale(0.93);}
 
-/* ── Shared ── */
-.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:14px;
-  padding:16px 28px;font-family:inherit;font-size:16px;font-weight:600;
-  cursor:pointer;width:100%;transition:opacity 0.2s;box-shadow:0 4px 20px rgba(99,102,241,0.35);}
-.btn-primary:active{opacity:0.82;}
-.btn-outline{background:none;color:var(--muted);border:1px solid var(--border2);
-  border-radius:14px;padding:14px;font-family:inherit;font-size:14px;cursor:pointer;width:100%;}
-.btn-outline:active{background:var(--surface2);}
+/* Summary card (onboarding step 3) */
+#deal-summary{background:var(--bg2);border-radius:16px;overflow:hidden;width:100%;}
+.summary-row{display:flex;justify-content:space-between;font-size:15px;padding:13px 18px;border-bottom:0.5px solid var(--sep);}
+.summary-row:last-child{border-bottom:none;}
+.summary-key{color:var(--label2);}
+.summary-val{font-weight:500;}
 
-/* ── Screen header ── */
-.s-header{display:flex;align-items:center;gap:12px;
-  padding:12px 18px;padding-top:calc(12px + var(--safe-top));
-  border-bottom:1px solid var(--border);flex-shrink:0;}
-.s-header h2{font-size:17px;font-weight:700;flex:1;}
-.icon-btn{background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;
-  display:flex;align-items:center;justify-content:center;border-radius:8px;}
-.icon-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;
-  stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-.icon-btn:active{background:var(--surface2);}
+/* Shared buttons */
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:14px;padding:16px;font-family:inherit;font-size:17px;font-weight:600;cursor:pointer;width:100%;transition:opacity 0.15s;}
+.btn-primary:active{opacity:0.75;}
+.btn-text-cancel{background:none;border:none;color:var(--accent);font-family:inherit;font-size:17px;cursor:pointer;padding:12px;width:100%;text-align:center;}
+.btn-text-cancel:active{opacity:0.6;}
+.btn-outline{background:var(--bg2);color:var(--label2);border:none;border-radius:12px;padding:10px;font-family:inherit;font-size:14px;cursor:pointer;flex:1;}
+.btn-outline:active{background:var(--bg3);}
+/* keep for OB back buttons */
+.btn-back{background:none;border:none;color:var(--accent);font-family:inherit;font-size:17px;cursor:pointer;padding:12px 0;width:100%;text-align:center;}
 
-/* ── Main screen ── */
-#s-main{padding-bottom:calc(72px + var(--safe-bottom));}
-.main-body{flex:1;overflow-y:auto;padding:20px 18px;display:flex;flex-direction:column;gap:16px;}
+/* Main screen */
+#s-main{padding-bottom:calc(80px + var(--safe-bottom));}
+.main-body{flex:1;overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:20px;}
 
-.deal-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px;
-  display:flex;flex-direction:column;gap:14px;}
-.deal-card.complete{border-color:var(--green);background:var(--green-dim);}
-.deal-card.debt{border-color:var(--orange);background:var(--orange-dim);}
-.deal-card.empty{border-color:var(--border);}
+/* Progress ring */
+.ring-section{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;}
+.ring-wrap{position:relative;width:220px;height:220px;}
+.ring-svg{width:220px;height:220px;transform:rotate(-90deg);}
+.ring-track{fill:none;stroke:rgba(255,255,255,0.06);stroke-width:18;}
+.ring-fill{fill:none;stroke:var(--accent);stroke-width:18;stroke-linecap:round;stroke-dasharray:502.65;stroke-dashoffset:502.65;transition:stroke-dashoffset 0.8s cubic-bezier(0.4,0,0.2,1),stroke 0.3s;}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.ring-num{font-size:64px;font-weight:800;letter-spacing:-3px;line-height:1;}
+.ring-num.r-done{color:var(--green);}
+.ring-label{font-size:14px;color:var(--label2);}
+.ring-sub{font-size:13px;color:var(--label3);margin-top:2px;}
 
-.exercise-label{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;}
-.due-number{font-size:72px;font-weight:800;letter-spacing:-4px;line-height:1;}
-.due-number.done{color:var(--green);}
-.due-number.todo{color:var(--text);}
-.due-sub{font-size:13px;color:var(--muted);display:flex;gap:12px;align-items:center;}
-.due-tag{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;}
-.tag-target{background:var(--accent-dim);color:var(--accent);}
-.tag-debt{background:var(--orange-dim);color:var(--orange);}
-.tag-done{background:var(--green-dim);color:var(--green);}
+.chips-row{display:flex;gap:10px;justify-content:center;}
+.chip{background:var(--bg2);border-radius:20px;padding:8px 16px;text-align:center;display:flex;flex-direction:column;gap:1px;}
+.chip-val{font-size:20px;font-weight:700;letter-spacing:-0.5px;}
+.chip-key{font-size:11px;color:var(--label2);}
+.chip.c-debt .chip-val{color:var(--orange);}
+.chip.c-done .chip-val{color:var(--green);}
 
-.progress-wrap{display:flex;flex-direction:column;gap:6px;}
-.progress-bar{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;}
-.progress-fill{height:100%;border-radius:3px;background:var(--accent);transition:width 0.4s ease;}
-.progress-fill.done{background:var(--green);}
-.progress-label{font-size:12px;color:var(--muted);text-align:left;}
+.main-cta{width:100%;background:var(--accent);color:#fff;border:none;border-radius:16px;padding:18px;font-family:inherit;font-size:17px;font-weight:600;cursor:pointer;transition:opacity 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.main-cta:active{opacity:0.75;}
 
-.complete-badge{display:flex;align-items:center;gap:8px;
-  background:var(--green-dim);border-radius:12px;padding:12px 16px;
-  color:var(--green);font-weight:600;font-size:15px;}
+.start-card{background:var(--bg2);border-radius:20px;padding:28px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;}
+.start-icon{font-size:52px;}
+.start-title{font-size:20px;font-weight:700;}
+.start-sub{font-size:15px;color:var(--label2);line-height:1.6;}
 
-.debt-cap-card{background:var(--red-dim);border:1px solid var(--red);
-  border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;}
-.debt-cap-card h3{color:var(--red);font-size:15px;font-weight:600;}
-.debt-cap-card p{font-size:13px;color:var(--muted);line-height:1.5;}
-.settle-btn{background:var(--red);color:#fff;border:none;border-radius:10px;
-  padding:10px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;}
+.cap-card{background:rgba(255,69,58,0.1);border-radius:16px;padding:18px;width:100%;display:flex;flex-direction:column;gap:8px;}
+.cap-title{font-size:16px;font-weight:600;color:var(--red);}
+.cap-body{font-size:14px;color:var(--label2);line-height:1.5;}
+.cap-btn{background:var(--red);color:#fff;border:none;border-radius:12px;padding:10px 20px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;align-self:flex-start;}
 
-/* ── Log screen (overlay) ── */
-#s-log{background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
-  justify-content:flex-end;align-items:center;z-index:110;}
-.log-sheet{background:var(--surface);border-radius:24px 24px 0 0;
-  padding:24px 24px calc(24px + var(--safe-bottom));width:100%;max-width:480px;
-  display:flex;flex-direction:column;align-items:center;gap:20px;}
-.log-sheet h2{font-size:20px;font-weight:700;align-self:flex-start;}
-.log-sub{font-size:14px;color:var(--muted);align-self:flex-start;margin-top:-14px;}
-.reps-display{font-size:80px;font-weight:800;letter-spacing:-4px;
-  color:var(--accent);min-width:120px;text-align:center;line-height:1;}
+/* Log sheet */
+#s-log{background:rgba(0,0,0,0.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);justify-content:flex-end;align-items:center;z-index:110;}
+.log-sheet{background:var(--bg2);border-radius:28px 28px 0 0;padding:12px 24px calc(20px + var(--safe-bottom));width:100%;max-width:480px;display:flex;flex-direction:column;align-items:center;gap:16px;animation:slideUp 0.35s cubic-bezier(0.34,1.2,0.64,1);}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{width:36px;height:5px;border-radius:3px;background:rgba(120,120,128,0.4);margin-bottom:4px;}
+.log-title{font-size:20px;font-weight:700;align-self:flex-start;}
+.log-sub{font-size:14px;color:var(--label2);align-self:flex-start;margin-top:-10px;}
+.reps-display{font-size:88px;font-weight:800;letter-spacing:-5px;color:var(--accent);text-align:center;line-height:1;}
 .reps-controls{display:flex;align-items:center;gap:24px;}
-.reps-btn{width:60px;height:60px;border-radius:50%;border:1.5px solid var(--border2);
-  background:var(--surface2);color:var(--text);font-size:30px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;transition:all 0.12s;}
-.reps-btn:active{transform:scale(0.9);background:var(--surface3);}
-.log-actions{display:flex;flex-direction:column;gap:10px;width:100%;}
+.reps-btn{width:64px;height:64px;border-radius:50%;background:var(--bg3);border:none;color:var(--label);font-size:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.1s;}
+.reps-btn:active{transform:scale(0.88);background:var(--bg4);}
+.small-btns{display:flex;gap:8px;width:100%;}
+.log-actions{display:flex;flex-direction:column;gap:4px;width:100%;}
 
-/* ── Calendar screen ── */
-#s-cal{padding-bottom:calc(72px + var(--safe-bottom));}
-.cal-body{flex:1;overflow-y:auto;padding:16px 18px 20px;}
-.cal-legend{display:flex;gap:14px;margin-bottom:16px;flex-wrap:wrap;}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
-.legend-dot{width:10px;height:10px;border-radius:3px;}
+/* Calendar */
+#s-cal{padding-bottom:calc(80px + var(--safe-bottom));}
+.cal-body{flex:1;overflow-y:auto;padding:16px 20px 20px;}
+.cal-legend{display:flex;gap:14px;margin-bottom:20px;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--label2);}
+.legend-dot{width:10px;height:10px;border-radius:4px;}
 .ld-complete{background:var(--green);}
 .ld-partial{background:var(--orange);}
 .ld-missed{background:var(--red);}
 .ld-today{background:var(--accent);}
-.ld-none{background:var(--surface3);}
-
-.cal-month{margin-bottom:20px;}
-.cal-month-label{font-size:14px;font-weight:600;color:var(--muted);
-  margin-bottom:8px;letter-spacing:0.02em;}
-.cal-week-labels{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;}
-.cal-week-labels span{font-size:10px;color:var(--muted);text-align:center;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.cal-cell{aspect-ratio:1;border-radius:4px;background:var(--surface2);cursor:default;}
+.ld-none{background:var(--bg4);}
+.cal-month{margin-bottom:28px;}
+.cal-month-label{font-size:20px;font-weight:700;letter-spacing:-0.3px;margin-bottom:12px;}
+.cal-week-labels{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;}
+.cal-week-labels span{font-size:11px;color:var(--label3);text-align:center;font-weight:500;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-cell{aspect-ratio:1;border-radius:8px;background:var(--bg2);}
 .cal-cell.complete{background:var(--green);}
-.cal-cell.partial{background:var(--orange);}
-.cal-cell.missed{background:var(--red);}
-.cal-cell.today{background:var(--accent);box-shadow:0 0 8px rgba(99,102,241,0.5);}
-.cal-cell.future{background:var(--surface2);opacity:0.4;}
+.cal-cell.partial{background:var(--orange);opacity:0.75;}
+.cal-cell.missed{background:var(--red);opacity:0.8;}
+.cal-cell.today{background:var(--accent);box-shadow:0 0 12px rgba(10,132,255,0.5);}
+.cal-cell.future{background:var(--bg2);opacity:0.25;}
 .cal-cell.empty{background:transparent;}
 
-/* ── Stats screen ── */
-#s-stat{padding-bottom:calc(72px + var(--safe-bottom));}
-.stat-body{flex:1;overflow-y:auto;padding:16px 18px 20px;display:flex;flex-direction:column;gap:12px;}
+/* Stats */
+#s-stat{padding-bottom:calc(80px + var(--safe-bottom));}
+.stat-body{flex:1;overflow-y:auto;padding:16px 20px 20px;display:flex;flex-direction:column;gap:12px;}
 .stat-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;}
+.stat-card{background:var(--bg2);border-radius:18px;padding:18px;}
 .stat-card.wide{grid-column:1/-1;}
-.stat-label{font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;}
-.stat-value{font-size:36px;font-weight:700;letter-spacing:-1.5px;line-height:1;}
-.stat-unit{font-size:14px;color:var(--muted);font-weight:400;}
-.streak-fire{font-size:24px;}
-
-.week-bars{display:flex;align-items:flex-end;gap:6px;height:60px;margin-top:10px;}
+.stat-label{font-size:12px;color:var(--label2);margin-bottom:8px;font-weight:500;}
+.stat-value{font-size:40px;font-weight:700;letter-spacing:-2px;line-height:1;}
+.stat-unit{font-size:14px;color:var(--label2);font-weight:400;letter-spacing:0;}
+.streak-fire{font-size:26px;}
+.week-bars{display:flex;align-items:flex-end;gap:6px;height:70px;margin-top:12px;}
 .week-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
-.week-bar{width:100%;border-radius:3px 3px 0 0;background:var(--accent-dim);
-  min-height:2px;transition:height 0.3s ease;}
+.week-bar{width:100%;border-radius:5px 5px 0 0;background:rgba(10,132,255,0.15);min-height:3px;transition:height 0.4s ease;}
 .week-bar.done{background:var(--accent);}
-.week-bar-label{font-size:9px;color:var(--muted);}
+.week-bar-label{font-size:9px;color:var(--label3);font-weight:500;}
 
-/* ── Settings screen ── */
-#s-set{padding-bottom:calc(72px + var(--safe-bottom));}
-.set-body{flex:1;overflow-y:auto;padding:16px 18px 20px;display:flex;flex-direction:column;gap:8px;}
-.set-section{font-size:12px;color:var(--muted);text-transform:uppercase;
-  letter-spacing:0.06em;margin-top:12px;margin-bottom:4px;}
-.set-row{background:var(--surface);border:1px solid var(--border);border-radius:14px;
-  padding:14px 16px;display:flex;align-items:center;gap:12px;}
-.set-row:first-child{border-radius:14px 14px 6px 6px;}
-.set-row:last-child{border-radius:6px 6px 14px 14px;}
-.set-row-group{display:flex;flex-direction:column;gap:2px;}
-.set-row-group .set-row{border-radius:0;border-bottom:none;}
-.set-row-group .set-row:first-child{border-radius:14px 14px 0 0;}
-.set-row-group .set-row:last-child{border-radius:0 0 14px 14px;border-bottom:1px solid var(--border);}
-.set-label{flex:1;font-size:15px;}
-.set-value{font-size:15px;color:var(--muted);}
-.set-input{background:none;border:none;color:var(--accent);font-family:inherit;
-  font-size:15px;outline:none;text-align:left;width:80px;}
-.toggle{width:48px;height:28px;border-radius:14px;background:var(--surface3);
-  position:relative;cursor:pointer;border:none;flex-shrink:0;transition:background 0.2s;}
+/* Settings — iOS inset grouped */
+#s-set{padding-bottom:calc(80px + var(--safe-bottom));}
+.set-body{flex:1;overflow-y:auto;padding:8px 20px 32px;}
+.set-section-hdr{font-size:12px;font-weight:400;color:var(--label2);text-transform:uppercase;letter-spacing:0.06em;padding:0 6px;margin-top:28px;margin-bottom:8px;}
+.set-section-hdr:first-child{margin-top:8px;}
+.set-group{background:var(--bg2);border-radius:12px;overflow:hidden;margin-bottom:2px;}
+.set-row{display:flex;align-items:center;padding:13px 16px;gap:12px;border-bottom:0.5px solid var(--sep);}
+.set-row:last-child{border-bottom:none;}
+.set-label{flex:1;font-size:16px;}
+.set-value{font-size:16px;color:var(--label2);}
+.set-input{background:none;border:none;color:var(--accent);font-family:inherit;font-size:16px;outline:none;text-align:left;width:90px;}
+.toggle{width:52px;height:32px;border-radius:16px;background:var(--bg4);position:relative;cursor:pointer;border:none;flex-shrink:0;transition:background 0.25s;}
 .toggle.on{background:var(--green);}
-.toggle::after{content:'';position:absolute;width:22px;height:22px;border-radius:50%;
-  background:#fff;top:3px;left:3px;transition:left 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.4);}
-.toggle.on::after{left:23px;}
-.danger-btn{background:var(--red-dim);color:var(--red);border:1px solid rgba(255,69,58,0.3);
-  border-radius:14px;padding:14px;font-family:inherit;font-size:15px;cursor:pointer;
-  width:100%;text-align:center;margin-top:8px;}
+.toggle::after{content:'';position:absolute;width:26px;height:26px;border-radius:50%;background:#fff;top:3px;right:3px;transition:right 0.25s;box-shadow:0 2px 6px rgba(0,0,0,0.35);}
+.toggle.on::after{right:23px;}
+.set-danger{margin-top:32px;}
+.danger-btn{background:rgba(255,69,58,0.12);color:var(--red);border:none;border-radius:12px;padding:16px;font-family:inherit;font-size:16px;cursor:pointer;width:100%;text-align:center;font-weight:500;}
+.danger-btn:active{background:rgba(255,69,58,0.2);}
 
-/* ── Toast ── */
-#toast{position:fixed;top:calc(60px + var(--safe-top));left:50%;transform:translateX(-50%);
-  background:rgba(44,44,46,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid var(--border2);border-radius:14px;padding:10px 18px;
-  font-size:14px;white-space:nowrap;z-index:200;
-  opacity:0;pointer-events:none;transition:opacity 0.2s;box-shadow:0 8px 28px rgba(0,0,0,0.5);}
+/* Toast */
+#toast{position:fixed;top:calc(52px + var(--safe-top));left:50%;transform:translateX(-50%);background:rgba(58,58,60,0.96);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-radius:20px;padding:10px 20px;font-size:14px;font-weight:500;white-space:nowrap;z-index:200;opacity:0;pointer-events:none;transition:opacity 0.2s;box-shadow:0 6px 24px rgba(0,0,0,0.4);}
 #toast.show{opacity:1;}
 
-/* ── No deal placeholder ── */
-.no-deal{display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:14px;flex:1;text-align:center;padding:32px;color:var(--muted);}
-.no-deal .icon{font-size:56px;}
-.no-deal p{font-size:15px;line-height:1.6;}
-
-/* ── Confetti canvas ── */
+.no-deal{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;flex:1;text-align:center;padding:32px;}
+.no-deal .icon{font-size:60px;}
+.no-deal p{font-size:16px;color:var(--label2);line-height:1.6;}
 canvas.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
-
-/* Scrollbar */
-::-webkit-scrollbar{width:3px;}
-::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px;}
+::-webkit-scrollbar{width:0;}
 </style>
 </head>
 <body>
@@ -282,7 +235,7 @@ canvas.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
       <div class="ob-dot"></div><div class="ob-dot on"></div><div class="ob-dot"></div>
     </div>
     <button class="btn-primary" onclick="obNext()">המשך ←</button>
-    <button class="btn-outline" onclick="obPrev()">חזור</button>
+    <button class="btn-back" onclick="obPrev()">חזור</button>
   </div>
 
   <div id="ob-step-2" class="ob-step">
@@ -299,7 +252,7 @@ canvas.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
         <div class="pct-row" id="pct-row" style="display:none">
           <label>אחוז יומי:</label>
           <input id="pct-input" type="number" value="20" min="10" max="100" placeholder="20">
-          <span style="font-size:13px;color:var(--muted)">%</span>
+          <span style="font-size:13px;color:var(--label2)">%</span>
         </div>
       </div>
     </div>
@@ -307,25 +260,17 @@ canvas.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
       <div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot on"></div>
     </div>
     <button class="btn-primary" onclick="obNext()">המשך ←</button>
-    <button class="btn-outline" onclick="obPrev()">חזור</button>
+    <button class="btn-back" onclick="obPrev()">חזור</button>
   </div>
 
   <div id="ob-step-3" class="ob-step">
     <div class="ob-icon">📋</div>
     <h2 class="ob-title">הדיל שלך</h2>
-    <div id="deal-summary" style="background:var(--surface);border-radius:16px;padding:18px 20px;width:100%;text-align:right;display:flex;flex-direction:column;gap:8px;">
-      <div style="display:flex;justify-content:space-between;font-size:14px;">
-        <span style="color:var(--muted)">תרגיל</span><span>שכיבות סמיכה 💪</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:14px;">
-        <span style="color:var(--muted)">יעד יומי</span><span id="sum-target">25 חזרות</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:14px;">
-        <span style="color:var(--muted)">קנס פספוס</span><span id="sum-penalty">כפול ×2</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:14px;">
-        <span style="color:var(--muted)">מתחיל</span><span>מחר בבוקר</span>
-      </div>
+    <div id="deal-summary">
+      <div class="summary-row"><span class="summary-key">תרגיל</span><span class="summary-val">שכיבות סמיכה 💪</span></div>
+      <div class="summary-row"><span class="summary-key">יעד יומי</span><span id="sum-target" class="summary-val">25 חזרות</span></div>
+      <div class="summary-row"><span class="summary-key">קנס</span><span id="sum-penalty" class="summary-val">כפול ×2</span></div>
+      <div class="summary-row"><span class="summary-key">מתחיל</span><span class="summary-val">מחר בבוקר</span></div>
     </div>
     <p class="ob-body" style="font-size:13px">לחץ על הכפתור כדי לחתום על הדיל</p>
     <button class="sign-btn" id="sign-btn" onclick="signDeal()">🤝</button>
@@ -336,7 +281,7 @@ canvas.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
 <div id="s-main" class="screen">
   <div class="s-header">
     <h2>דיל כושר</h2>
-    <span id="streak-badge" style="font-size:13px;color:var(--muted);display:none"></span>
+    <span id="streak-badge" style="font-size:13px;color:var(--label2);display:none"></span>
     <button class="icon-btn" onclick="show('log')" id="log-fab" style="display:none">
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
@@ -347,21 +292,22 @@ canvas.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
 <!-- ═══════════════ LOG ═══════════════ -->
 <div id="s-log" class="screen" onclick="handleLogBg(event)">
   <div class="log-sheet">
-    <h2>רישום אימון</h2>
-    <p class="log-sub" id="log-sub">כמה שכיבות עשית?</p>
+    <div class="sheet-handle"></div>
+    <div class="log-title">רישום אימון</div>
+    <div class="log-sub" id="log-sub">כמה שכיבות עשית?</div>
     <div class="reps-controls">
       <button class="reps-btn" onclick="changeReps(-5)">−</button>
       <div class="reps-display" id="reps-display">0</div>
       <button class="reps-btn" onclick="changeReps(5)">+</button>
     </div>
-    <div style="display:flex;gap:8px;width:100%;">
-      <button id="log-minus1" class="btn-outline" style="font-size:12px;padding:10px" onclick="changeReps(-1)">−1</button>
-      <button id="log-plus1" class="btn-outline" style="font-size:12px;padding:10px" onclick="changeReps(1)">+1</button>
-      <button class="btn-outline" style="font-size:12px;padding:10px;flex:2" id="log-all-btn" onclick="logAll()">כל היעד</button>
+    <div class="small-btns">
+      <button id="log-minus1" class="btn-outline" onclick="changeReps(-1)">−1</button>
+      <button id="log-plus1" class="btn-outline" onclick="changeReps(1)">+1</button>
+      <button class="btn-outline" style="flex:2" id="log-all-btn" onclick="logAll()">כל היעד</button>
     </div>
     <div class="log-actions">
-      <button class="btn-primary" onclick="saveLog()">שמור ✓</button>
-      <button class="btn-outline" onclick="show('main')">ביטול</button>
+      <button class="btn-primary" onclick="saveLog()">שמור</button>
+      <button class="btn-text-cancel" onclick="show('main')">ביטול</button>
     </div>
   </div>
 </div>
@@ -665,7 +611,7 @@ function renderMain() {
   if (!DATA.deal?.active) {
     body.innerHTML = `<div class="no-deal">
       <div class="icon">🏋️</div>
-      <p>אין דיל פעיל.<br>לחץ "+" למעלה כדי להתחיל.</p>
+      <p>אין דיל פעיל.<br>לחץ + כדי להתחיל.</p>
     </div>`;
     fab.style.display = 'flex';
     fab.onclick = () => { obStep = 0; show('ob'); };
@@ -675,14 +621,18 @@ function renderMain() {
   fab.style.display = 'flex';
   fab.onclick = () => show('log');
 
-  // Deal hasn't started yet (signed today, starts tomorrow)
   if (todayStr() < DATA.deal.startDate) {
     const startFmt = formatDate(DATA.deal.startDate);
     body.innerHTML = `
-      <div class="deal-card" style="text-align:center;gap:10px;align-items:center;">
-        <div style="font-size:48px">🤝</div>
-        <div style="font-size:18px;font-weight:700">הדיל הושלם!</div>
-        <div style="font-size:14px;color:var(--muted)">האימון הראשון מתחיל<br><strong style="color:var(--text)">${startFmt}</strong></div>
+      <div class="start-card">
+        <div class="start-icon">🤝</div>
+        <div class="start-title">הדיל נחתם!</div>
+        <div class="start-sub">האימון הראשון מתחיל<br><strong>${startFmt}</strong></div>
+      </div>
+      <div class="start-card" style="gap:6px;align-items:flex-start;">
+        <div style="font-size:13px;color:var(--label3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">הדיל שלך</div>
+        <div style="display:flex;justify-content:space-between;width:100%;font-size:15px;padding:4px 0;border-bottom:0.5px solid var(--sep)"><span style="color:var(--label2)">יעד יומי</span><span style="font-weight:600">${DATA.deal.dailyTarget} חזרות</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;font-size:15px;padding:4px 0"><span style="color:var(--label2)">קנס</span><span style="font-weight:600">${DATA.deal.penaltyType==='double'?'כפול ×2':'ריבית '+DATA.deal.penaltyPercent+'%'}</span></div>
       </div>`;
     streakBadge.style.display = 'none';
     return;
@@ -692,79 +642,55 @@ function renderMain() {
   const logged = todayLogged();
   const debt = DATA.debt || 0;
   const due = totalDue();
-  const done = isTodayDone();
+  const done = isTodayDone() && debt === 0;
   const { current: streak } = getStreak();
 
-  // Streak badge
   if (streak > 1) {
-    streakBadge.textContent = `🔥 ${streak} ימים`;
+    streakBadge.textContent = `🔥 ${streak}`;
     streakBadge.style.display = 'inline';
   } else {
     streakBadge.style.display = 'none';
   }
 
-  let cardClass = 'deal-card';
-  if (done && debt === 0) cardClass += ' complete';
-  else if (debt > 0) cardClass += ' debt';
+  const total = target + debt;
+  const pct = total > 0 ? Math.min(1, logged / total) : 1;
+  const C = 502.65;
+  const offset = (C * (1 - pct)).toFixed(1);
+  const ringColor = done ? 'var(--green)' : debt > 0 ? 'var(--orange)' : 'var(--accent)';
+  const numClass = done ? 'r-done' : '';
 
-  const pct = due > 0 ? Math.round((logged / (target + debt)) * 100) : 100;
-  const fillClass = (done && debt === 0) ? 'done' : '';
+  let chipsHtml = `<div class="chips-row">
+    <div class="chip"><div class="chip-val">${target}</div><div class="chip-key">יעד</div></div>`;
+  if (debt > 0) chipsHtml += `<div class="chip c-debt"><div class="chip-val">${debt}</div><div class="chip-key">חוב</div></div>`;
+  chipsHtml += `<div class="chip c-done"><div class="chip-val">${logged}</div><div class="chip-key">הושלמו</div></div></div>`;
 
-  let cardContent = '';
-
-  if (done && debt === 0) {
-    cardContent = `
-      <div class="exercise-label">שכיבות סמיכה</div>
-      <div class="due-number done">${logged}</div>
-      <div class="complete-badge">
-        <span>✅</span><span>הדיל הושלם היום!</span>
-      </div>`;
-  } else {
-    const tags = [];
-    tags.push(`<span class="due-tag tag-target">יעד: ${target}</span>`);
-    if (debt > 0) tags.push(`<span class="due-tag tag-debt">חוב: ${debt}</span>`);
-
-    cardContent = `
-      <div class="exercise-label">שכיבות סמיכה</div>
-      <div class="due-number todo">${due}</div>
-      <div class="due-sub">${tags.join('')}</div>
-      <div class="progress-wrap">
-        <div class="progress-bar">
-          <div class="progress-fill ${fillClass}" style="width:${pct}%"></div>
-        </div>
-        <div class="progress-label">${logged} מתוך ${target + debt}</div>
-      </div>`;
-  }
-
-  let debtCapCard = '';
+  let capHtml = '';
   if (DATA.debtOverCap) {
-    debtCapCard = `<div class="debt-cap-card">
-      <h3>⚠️ הגעת לתקרת החוב</h3>
-      <p>החוב הגיע ל-${target * 5} חזרות (5× היעד היומי). ניתן לפרוס אותו או לאתחל את הדיל.</p>
-      <button class="settle-btn" onclick="showSettle()">הסדר חוב</button>
+    capHtml = `<div class="cap-card">
+      <div class="cap-title">⚠️ תקרת חוב</div>
+      <div class="cap-body">החוב הגיע לגבול (${target*5} חזרות). ניתן לפרוס אותו על פני כמה ימים.</div>
+      <button class="cap-btn" onclick="showSettle()">הסדר חוב</button>
     </div>`;
   }
 
-  // Yesterday info
-  const yesterday = addDays(todayStr(), -1);
-  let yesterdayCard = '';
-  if (DATA.deal.startDate <= yesterday) {
-    const ys = getDayStatus(yesterday);
-    const yl = (DATA.logs && DATA.logs[yesterday]) || 0;
-    if (ys === 'missed') {
-      yesterdayCard = `<div class="deal-card" style="border-color:var(--red-dim);background:var(--red-dim);padding:14px 18px;">
-        <div style="font-size:13px;color:var(--red)">⚠️ אתמול פוספס — ${DATA.deal.penaltyType==='double'?'חוב הוכפל':'חוב גדל בריבית'}</div>
-      </div>`;
-    }
-  }
-
-  const todayDate = formatDate(todayStr());
   body.innerHTML = `
-    <div style="font-size:13px;color:var(--muted);margin-bottom:4px">${todayDate}</div>
-    <div class="${cardClass}">${cardContent}</div>
-    ${debtCapCard}
-    ${yesterdayCard}
-    ${!done ? `<button class="btn-primary" onclick="show('log')" style="margin-top:4px">🏋️ רשום אימון</button>` : ''}
+    <div class="ring-section">
+      <div class="ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 200 200">
+          <circle class="ring-track" cx="100" cy="100" r="80"/>
+          <circle class="ring-fill" id="ring-prog" cx="100" cy="100" r="80"
+            style="stroke-dashoffset:${offset};stroke:${ringColor}"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-num ${numClass}">${done ? '✓' : due}</div>
+          <div class="ring-label">${done ? 'הושלם היום!' : 'לביצוע היום'}</div>
+          ${logged > 0 && !done ? `<div class="ring-sub">${logged} / ${total}</div>` : ''}
+        </div>
+      </div>
+      ${chipsHtml}
+    </div>
+    ${capHtml}
+    ${!done ? `<button class="main-cta" onclick="show('log')">💪  רשום אימון</button>` : ''}
   `;
 }
 
@@ -956,42 +882,39 @@ function renderSettings() {
 
   let dealSection = '';
   if (deal?.active) {
-    const penStr = deal.penaltyType === 'double'
-      ? 'כפול ×2'
-      : `ריבית ${deal.penaltyPercent}% יומי`;
+    const penStr = deal.penaltyType === 'double' ? 'כפול ×2' : `ריבית ${deal.penaltyPercent}%`;
     dealSection = `
-      <div class="set-section">הדיל הנוכחי</div>
-      <div class="set-row-group">
+      <div class="set-section-hdr">הדיל הפעיל</div>
+      <div class="set-group">
         <div class="set-row"><span class="set-label">תרגיל</span><span class="set-value">שכיבות סמיכה 💪</span></div>
         <div class="set-row"><span class="set-label">יעד יומי</span><span class="set-value">${deal.dailyTarget} חזרות</span></div>
-        <div class="set-row"><span class="set-label">קנס פספוס</span><span class="set-value">${penStr}</span></div>
-        <div class="set-row"><span class="set-label">תאריך התחלה</span><span class="set-value">${formatDate(deal.startDate)}</span></div>
-        <div class="set-row"><span class="set-label">חוב פתוח</span><span class="set-value" style="color:${DATA.debt>0?'var(--orange)':'var(--green)'}">
-          ${DATA.debt > 0 ? DATA.debt + ' חז\'' : 'אין חוב ✓'}</span></div>
+        <div class="set-row"><span class="set-label">קנס</span><span class="set-value">${penStr}</span></div>
+        <div class="set-row"><span class="set-label">התחיל</span><span class="set-value">${formatDate(deal.startDate)}</span></div>
+        <div class="set-row"><span class="set-label">חוב פתוח</span><span class="set-value" style="color:${DATA.debt>0?'var(--orange)':'var(--green)'}">${DATA.debt > 0 ? DATA.debt + ' חזרות' : 'אין ✓'}</span></div>
       </div>`;
   }
 
   const notifToggle = s.notificationsEnabled ? 'on' : '';
+  const reminderTime = `${String(s.reminderHour||20).padStart(2,'0')}:00`;
 
   body.innerHTML = `
     ${dealSection}
-    <div class="set-section">התראות</div>
-    <div class="set-row-group">
+    <div class="set-section-hdr">התראות</div>
+    <div class="set-group">
       <div class="set-row">
         <span class="set-label">תזכורת יומית</span>
         <button class="toggle ${notifToggle}" id="notif-toggle" onclick="toggleNotif()"></button>
       </div>
       <div class="set-row">
         <span class="set-label">שעת תזכורת</span>
-        <input class="set-input" type="time" value="${String(s.reminderHour||20).padStart(2,'0')}:00"
-          onchange="setReminderTime(this.value)">
+        <input class="set-input" type="time" value="${reminderTime}" onchange="setReminderTime(this.value)">
       </div>
     </div>
-    ${deal?.active ? `
-    <div class="set-section">אזור סכנה</div>
-    <button class="danger-btn" onclick="confirmReset()">🗑️ אתחל דיל מחדש</button>` : `
-    <div class="set-section">דיל חדש</div>
-    <button class="btn-primary" onclick="startNewDeal()">+ צור דיל חדש</button>`}
+    <div class="set-danger">
+      ${deal?.active
+        ? `<button class="danger-btn" onclick="confirmReset()">אתחל דיל מחדש</button>`
+        : `<button class="btn-primary" onclick="startNewDeal()">+ צור דיל חדש</button>`}
+    </div>
   `;
 }
 
