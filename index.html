@@ -129,6 +129,17 @@ header{display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:ca
 #toast.show{display:flex;animation:toastIn 0.2s ease;}
 #toast.processing{border-color:var(--warn);color:var(--warn);}
 .toast-msg{flex:1;}.toast-close{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;line-height:1;flex-shrink:0;padding:0;}
+/* Confirm dialog */
+.conf-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center;}
+.conf-overlay.open{display:flex;animation:toastIn 0.15s ease;}
+.conf-dialog{background:var(--surface);border:1px solid var(--border2);border-radius:18px;padding:22px 20px 16px;width:min(300px,88vw);box-shadow:0 16px 48px rgba(0,0,0,0.6);text-align:center;}
+[data-theme=light] .conf-dialog{box-shadow:0 8px 24px rgba(0,0,0,0.15);}
+.conf-dialog p{font-size:14px;line-height:1.5;margin-bottom:18px;color:var(--text);}
+.conf-btns{display:flex;gap:8px;}
+.conf-cancel{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:14px;font-weight:500;padding:10px;border-radius:12px;cursor:pointer;transition:background 0.15s;}
+.conf-cancel:hover{background:var(--surface3);}
+.conf-ok{flex:1;background:var(--danger);border:none;color:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:10px;border-radius:12px;cursor:pointer;transition:opacity 0.15s;}
+.conf-ok:hover{opacity:0.85;}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-6px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .proc-dots::after{content:'';animation:proc-dots 1.2s steps(1) infinite;}
 @keyframes proc-dots{0%{content:''}33%{content:'.'}66%{content:'..'}99%{content:'...'}}
@@ -736,22 +747,42 @@ function toggle(id) {
     persistItems(); render();
   }
 }
+let _confirmCb = null;
+function showConfirm(msg, onOk) {
+  document.getElementById('conf-msg').textContent = msg;
+  _confirmCb = onOk;
+  document.getElementById('conf-ok').onclick = () => { hideConfirm(); onOk(); };
+  document.getElementById('conf-overlay').classList.add('open');
+}
+function hideConfirm() {
+  document.getElementById('conf-overlay').classList.remove('open');
+  _confirmCb = null;
+}
+
 function delItem(id) {
-  items = items.filter(i => i.id !== id);
-  persistItems(); render();
+  const it = items.find(i => i.id === id);
+  if (!it) return;
+  showConfirm(`למחוק את "${it.name}"?`, () => {
+    items = items.filter(i => i.id !== id);
+    persistItems(); render();
+  });
 }
 function clearDone() {
   const n = items.filter(i=>i.done).length;
-  items = items.filter(i=>!i.done);
-  persistItems(); render();
-  if (n) addBot(`הסרתי ${n} פריטים שסומנו ✓`);
+  if (!n) return;
+  showConfirm(`למחוק ${n} פריטים שסומנו כנקנו?`, () => {
+    items = items.filter(i=>!i.done);
+    persistItems(); render();
+    addBot(`הסרתי ${n} פריטים שסומנו ✓`);
+  });
 }
 function clearAll() {
   if (!items.length) return;
-  if (!confirm(`למחוק את כל ${items.length} הפריטים ברשימה?`)) return;
-  items = [];
-  persistItems(); render();
-  addBot('הרשימה נוקתה 🗑️');
+  showConfirm(`למחוק את כל ${items.length} הפריטים ברשימה?`, () => {
+    items = [];
+    persistItems(); render();
+    addBot('הרשימה נוקתה 🗑️');
+  });
 }
 
 // ── Claude API ────────────────────────────────────────────
@@ -1029,5 +1060,16 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload());
 }
 </script>
+
+<!-- Confirm dialog -->
+<div class="conf-overlay" id="conf-overlay" onclick="hideConfirm()">
+  <div class="conf-dialog" onclick="event.stopPropagation()">
+    <p id="conf-msg"></p>
+    <div class="conf-btns">
+      <button class="conf-cancel" onclick="hideConfirm()">ביטול</button>
+      <button class="conf-ok" id="conf-ok">מחק</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
