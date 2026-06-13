@@ -137,7 +137,7 @@ header{display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:ca
 .cat-group.dragging{opacity:0.3;}
 .drag-ghost{position:fixed;z-index:500;opacity:0.9;pointer-events:none;background:var(--surface2);border:1px solid var(--accent);border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,0.5);}
 #tab-bar{display:none;}
-.ci{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;flex-shrink:0;}
+.ci{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;flex-shrink:0;background:var(--accent-dim);border-radius:50%;color:var(--accent);}
 .cat-chip{background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;}
 #cat-picker{display:none;position:fixed;z-index:300;background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:8px;min-width:180px;max-height:320px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.4);}
 [data-theme=light] #cat-picker{box-shadow:0 4px 16px rgba(0,0,0,0.12);}
@@ -404,30 +404,20 @@ function initApp() {
 initApp();
 
 // ── Render ────────────────────────────────────────────────
-function mkIcon(paths, color) {
-  return `<span class="ci" style="background:${color}22;border-radius:50%;color:${color}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg></span>`;
+function mkIcon(paths) {
+  return `<span class="ci"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg></span>`;
 }
 const CAT_ICONS = {
-  // Plant — two leaves from central stem
-  'ירקות ופירות': mkIcon('<path d="M12 22V12"/><path d="M12 12C9 10 5 7 5 3C9 3 12 7 12 12"/><path d="M12 12C15 10 19 7 19 3C15 3 12 7 12 12"/>', '#22c55e'),
-  // Bread loaf — arch + base rectangle
-  'מאפייה': mkIcon('<path d="M5 12C5 8 8 5 12 5C16 5 19 8 19 12"/><rect x="4" y="12" width="16" height="7" rx="2"/>', '#f59e0b'),
-  // Milk jug — trapezoid with liquid line
-  'חלב וביצים': mkIcon('<path d="M8 2H16L18 22H6Z"/><line x1="7" y1="9" x2="17" y2="9"/>', '#38bdf8'),
-  // Fish — oval body + tail triangle + eye
-  'בשר ודגים': mkIcon('<path d="M3 12C5 8 8 5 12 5C16 5 19 8 20 12C19 16 16 19 12 19C8 19 5 16 3 12Z"/><path d="M20 12L24 8L24 16Z"/><circle cx="9" cy="11" r="1.5" fill="currentColor" stroke="none"/>', '#f87171'),
-  // Sparkle — universal "clean" symbol
-  'מוצרי ניקיון': mkIcon('<path d="M12 3L13.4 9.6L20 11L13.4 12.4L12 19L10.6 12.4L4 11L10.6 9.6Z"/><circle cx="19" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="5" cy="18" r="1" fill="currentColor" stroke="none"/>', '#a78bfa'),
-  // Can — cylinder with label line
-  'שימורים ויבשים': mkIcon('<ellipse cx="12" cy="7" rx="6" ry="2"/><line x1="6" y1="7" x2="6" y2="17"/><line x1="18" y1="7" x2="18" y2="17"/><ellipse cx="12" cy="17" rx="6" ry="2"/><line x1="6" y1="12" x2="18" y2="12"/>', '#fb923c'),
-  // Bottle — neck + body + line
-  'משקאות': mkIcon('<path d="M9 2H15V7L17 9V21C17 21.5 16.5 22 16 22H8C7.5 22 7 21.5 7 21V9L9 7V2Z"/><line x1="7" y1="15" x2="17" y2="15"/>', '#22d3ee'),
-  // Snowflake
-  'קפואים': mkIcon('<line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M5 5L19 19M19 5L5 19"/>', '#818cf8'),
-  // 5-point star — treats
-  'ממתקים וחטיפים': mkIcon('<polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>', '#f472b6'),
-  // Shopping bag
-  'אחר': mkIcon('<path d="M6 2L3 6V20C3 21 4 22 5 22H19C20 22 21 21 21 20V6L18 2Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10C16 12 14 14 12 14C10 14 8 12 8 10"/>', '#94a3b8'),
+  'ירקות ופירות': mkIcon('<path d="M12 22V12"/><path d="M12 12C9 10 5 7 5 3C9 3 12 7 12 12"/><path d="M12 12C15 10 19 7 19 3C15 3 12 7 12 12"/>'),
+  'מאפייה':       mkIcon('<path d="M5 12C5 8 8 5 12 5C16 5 19 8 19 12"/><rect x="4" y="12" width="16" height="7" rx="2"/>'),
+  'חלב וביצים':   mkIcon('<path d="M8 2H16L18 22H6Z"/><line x1="7" y1="9" x2="17" y2="9"/>'),
+  'בשר ודגים':    mkIcon('<path d="M3 12C5 8 8 5 12 5C16 5 19 8 20 12C19 16 16 19 12 19C8 19 5 16 3 12Z"/><path d="M20 12L24 8L24 16Z"/><circle cx="9" cy="11" r="1.5" fill="currentColor" stroke="none"/>'),
+  'מוצרי ניקיון': mkIcon('<path d="M12 3L13.4 9.6L20 11L13.4 12.4L12 19L10.6 12.4L4 11L10.6 9.6Z"/><circle cx="19" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="5" cy="18" r="1" fill="currentColor" stroke="none"/>'),
+  'שימורים ויבשים': mkIcon('<ellipse cx="12" cy="7" rx="6" ry="2"/><line x1="6" y1="7" x2="6" y2="17"/><line x1="18" y1="7" x2="18" y2="17"/><ellipse cx="12" cy="17" rx="6" ry="2"/><line x1="6" y1="12" x2="18" y2="12"/>'),
+  'משקאות':       mkIcon('<path d="M9 2H15V7L17 9V21C17 21.5 16.5 22 16 22H8C7.5 22 7 21.5 7 21V9L9 7V2Z"/><line x1="7" y1="15" x2="17" y2="15"/>'),
+  'קפואים':       mkIcon('<line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M5 5L19 19M19 5L5 19"/>'),
+  'ממתקים וחטיפים': mkIcon('<polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>'),
+  'אחר':          mkIcon('<path d="M6 2L3 6V20C3 21 4 22 5 22H19C20 22 21 21 21 20V6L18 2Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10C16 12 14 14 12 14C10 14 8 12 8 10"/>'),
   // aliases — AI sometimes returns shorter names
   'ירקות':        null,'פירות':null,
   'חלב':          null,'ביצים':null,
