@@ -12,75 +12,115 @@
       <stop offset="0%" stop-color="#FFD740"/>
       <stop offset="100%" stop-color="#FF9800"/>
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000" flood-opacity="0.4"/>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#000" flood-opacity="0.45"/>
     </filter>
     <filter id="glow">
-      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#4DB6AC" flood-opacity="0.5"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#4DB6AC" flood-opacity="0.55"/>
     </filter>
+    <filter id="dept-shadow">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+    <clipPath id="cart-clip">
+      <path d="M 158,158 L 435,158 L 405,318 L 188,318 Z"/>
+    </clipPath>
   </defs>
 
   <!-- Background -->
   <rect width="512" height="512" rx="108" fill="url(#bg)"/>
 
-  <!-- Subtle grid lines in background -->
-  <line x1="0" y1="170" x2="512" y2="170" stroke="rgba(77,182,172,0.06)" stroke-width="1"/>
-  <line x1="0" y1="340" x2="512" y2="340" stroke="rgba(77,182,172,0.06)" stroke-width="1"/>
-  <line x1="170" y1="0" x2="170" y2="512" stroke="rgba(77,182,172,0.06)" stroke-width="1"/>
-  <line x1="340" y1="0" x2="340" y2="512" stroke="rgba(77,182,172,0.06)" stroke-width="1"/>
+  <!-- Subtle grid -->
+  <line x1="0" y1="170" x2="512" y2="170" stroke="rgba(77,182,172,0.05)" stroke-width="1"/>
+  <line x1="0" y1="340" x2="512" y2="340" stroke="rgba(77,182,172,0.05)" stroke-width="1"/>
+  <line x1="170" y1="0" x2="170" y2="512" stroke="rgba(77,182,172,0.05)" stroke-width="1"/>
+  <line x1="340" y1="0" x2="340" y2="512" stroke="rgba(77,182,172,0.05)" stroke-width="1"/>
 
   <!-- Cart handle -->
-  <path d="M 72,82 Q 72,58 96,58 L 148,58" stroke="url(#cart-fill)" stroke-width="24" stroke-linecap="round" fill="none" filter="url(#glow)"/>
-  <line x1="148" y1="58" x2="166" y2="158" stroke="url(#cart-fill)" stroke-width="24" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M 76,88 Q 76,60 104,60 L 152,60" stroke="url(#cart-fill)" stroke-width="22" stroke-linecap="round" fill="none" filter="url(#glow)"/>
+  <line x1="152" y1="60" x2="166" y2="158" stroke="url(#cart-fill)" stroke-width="22" stroke-linecap="round" filter="url(#glow)"/>
 
-  <!-- Cart body (trapezoid shape) -->
-  <path d="M 158,158 L 435,158 L 405,318 L 188,318 Z" fill="url(#cart-fill)" filter="url(#shadow)" rx="6"/>
+  <!-- Cart body -->
+  <path d="M 158,158 L 435,158 L 405,318 L 188,318 Z" fill="url(#cart-fill)" filter="url(#shadow)"/>
 
-  <!-- Cart body inner separator lines -->
-  <line x1="255" y1="158" x2="242" y2="318" stroke="rgba(0,40,35,0.25)" stroke-width="2.5"/>
-  <line x1="335" y1="158" x2="322" y2="318" stroke="rgba(0,40,35,0.25)" stroke-width="2.5"/>
-  <line x1="158" y1="238" x2="430" y2="238" stroke="rgba(0,40,35,0.25)" stroke-width="2.5"/>
+  <!-- Inner dividers -->
+  <line x1="258" y1="160" x2="246" y2="316" stroke="rgba(0,40,35,0.28)" stroke-width="2"/>
+  <line x1="336" y1="160" x2="324" y2="316" stroke="rgba(0,40,35,0.28)" stroke-width="2"/>
+  <line x1="160" y1="238" x2="432" y2="238" stroke="rgba(0,40,35,0.28)" stroke-width="2.5"/>
 
-  <!-- Colorful product circles — top row -->
-  <!-- Red (produce/vegetables) -->
-  <circle cx="213" cy="198" r="30" fill="#FF5252" filter="url(#shadow)"/>
-  <circle cx="213" cy="193" r="10" fill="rgba(255,255,255,0.3)"/>
+  <!-- ═══════ ROW 1: 3 department circles ═══════ -->
 
-  <!-- Orange (fruit) -->
-  <circle cx="290" cy="198" r="30" fill="#FF9800" filter="url(#shadow)"/>
-  <circle cx="290" cy="193" r="10" fill="rgba(255,255,255,0.3)"/>
+  <!-- 1. ירקות (Produce) — green -->
+  <circle cx="210" cy="200" r="33" fill="#43A047" filter="url(#dept-shadow)" clip-path="url(#cart-clip)"/>
+  <!-- Carrot: tapered body + leaf sprigs -->
+  <path d="M 210,214 Q 204,194 205,186 Q 210,182 215,186 Q 216,194 210,214 Z"
+        fill="rgba(255,255,255,0.92)"/>
+  <path d="M 210,188 Q 204,182 203,176" stroke="rgba(255,255,255,0.9)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path d="M 210,187 Q 210,180 210,174" stroke="rgba(255,255,255,0.9)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path d="M 210,188 Q 216,182 217,176" stroke="rgba(255,255,255,0.9)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
 
-  <!-- Yellow-green (dairy) -->
-  <circle cx="367" cy="198" r="28" fill="#C6E52B" filter="url(#shadow)"/>
-  <circle cx="367" cy="193" r="9" fill="rgba(255,255,255,0.3)"/>
+  <!-- 2. פירות (Fruit) — red -->
+  <circle cx="291" cy="200" r="33" fill="#E53935" filter="url(#dept-shadow)" clip-path="url(#cart-clip)"/>
+  <!-- Apple: body + stem + small leaf -->
+  <path d="M 284,198 Q 283,187 291,186 Q 299,187 298,198 Q 297,210 291,212 Q 285,210 284,198 Z"
+        fill="rgba(255,255,255,0.92)"/>
+  <path d="M 291,187 Q 292,181 295,179" stroke="rgba(255,255,255,0.9)" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 293,182 Q 297,180 298,183" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Apple divot at top -->
+  <path d="M 288,188 Q 291,187 294,188" stroke="rgba(229,57,53,0.5)" stroke-width="1.5" fill="none"/>
 
-  <!-- Bottom row -->
-  <!-- Purple (sweets) -->
-  <circle cx="220" cy="278" r="26" fill="#CE93D8" filter="url(#shadow)"/>
-  <circle cx="220" cy="274" r="9" fill="rgba(255,255,255,0.3)"/>
+  <!-- 3. חלב (Dairy) — light blue -->
+  <circle cx="370" cy="200" r="31" fill="#0288D1" filter="url(#dept-shadow)" clip-path="url(#cart-clip)"/>
+  <!-- Milk bottle: cap + neck + body -->
+  <path d="M 366,182 Q 366,178 370,178 Q 374,178 374,182 L 374,185 L 366,185 Z"
+        fill="rgba(255,255,255,0.92)"/>
+  <path d="M 366,185 L 364,188 L 376,188 L 374,185 Z" fill="rgba(255,255,255,0.85)"/>
+  <path d="M 364,188 Q 362,189 362,202 Q 362,214 370,214 Q 378,214 378,202 Q 378,189 376,188 Z"
+        fill="rgba(255,255,255,0.92)"/>
+  <!-- Liquid line inside bottle -->
+  <path d="M 363,204 Q 370,207 377,204" stroke="#0288D1" stroke-width="1.5" fill="none"/>
 
-  <!-- Cyan (beverages) -->
-  <circle cx="293" cy="278" r="26" fill="#4FC3F7" filter="url(#shadow)"/>
-  <circle cx="293" cy="274" r="9" fill="rgba(255,255,255,0.3)"/>
+  <!-- ═══════ ROW 2: 3 department circles ═══════ -->
 
-  <!-- Pink (bakery) -->
-  <circle cx="364" cy="278" r="24" fill="#F48FB1" filter="url(#shadow)"/>
-  <circle cx="364" cy="274" r="8" fill="rgba(255,255,255,0.3)"/>
+  <!-- 4. בשר (Meat) — deep orange -->
+  <circle cx="217" cy="278" r="29" fill="#D84315" filter="url(#dept-shadow)" clip-path="url(#cart-clip)"/>
+  <!-- Drumstick: meat oval + bone stick + knob -->
+  <ellipse cx="220" cy="284" rx="8" ry="10" fill="rgba(255,255,255,0.92)"/>
+  <line x1="215" y1="278" x2="206" y2="266" stroke="rgba(255,255,255,0.92)" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="206" cy="265" r="5" fill="rgba(255,255,255,0.92)"/>
 
-  <!-- Cart bottom edge strip -->
-  <rect x="188" y="309" width="217" height="18" rx="9" fill="#004D40"/>
+  <!-- 5. שתייה (Beverages) — teal/cyan -->
+  <circle cx="294" cy="278" r="29" fill="#00838F" filter="url(#dept-shadow)" clip-path="url(#cart-clip)"/>
+  <!-- Water drop -->
+  <path d="M 294,263 Q 304,272 304,279 Q 304,287 294,288 Q 284,287 284,279 Q 284,272 294,263 Z"
+        fill="rgba(255,255,255,0.92)"/>
+  <!-- Highlight inside drop -->
+  <path d="M 288,276 Q 287,272 290,270" stroke="rgba(0,131,143,0.6)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+  <!-- 6. מאפייה (Bakery) — amber -->
+  <circle cx="367" cy="278" r="27" fill="#FF8F00" filter="url(#dept-shadow)" clip-path="url(#cart-clip)"/>
+  <!-- Bread loaf: rounded rectangle + score lines -->
+  <path d="M 359,275 Q 359,266 367,265 Q 375,266 375,275 L 375,283 Q 375,287 367,287 Q 359,287 359,283 Z"
+        fill="rgba(255,255,255,0.92)"/>
+  <!-- Score marks on bread -->
+  <path d="M 363,267 Q 363,285 363,285" stroke="#FF8F00" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+  <path d="M 367,266 Q 367,285 367,285" stroke="#FF8F00" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+  <path d="M 371,267 Q 371,285 371,285" stroke="#FF8F00" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+
+  <!-- Cart bottom bar -->
+  <rect x="188" y="308" width="217" height="16" rx="8" fill="#004D40"/>
 
   <!-- Wheels -->
-  <circle cx="230" cy="368" r="32" fill="#1A4A44" stroke="#4DB6AC" stroke-width="9" filter="url(#shadow)"/>
-  <circle cx="230" cy="368" r="9" fill="#4DB6AC"/>
-  <circle cx="376" cy="368" r="32" fill="#1A4A44" stroke="#4DB6AC" stroke-width="9" filter="url(#shadow)"/>
-  <circle cx="376" cy="368" r="9" fill="#4DB6AC"/>
+  <circle cx="232" cy="368" r="32" fill="#1A4A44" stroke="#4DB6AC" stroke-width="9" filter="url(#shadow)"/>
+  <circle cx="232" cy="368" r="9" fill="#4DB6AC"/>
+  <circle cx="375" cy="368" r="32" fill="#1A4A44" stroke="#4DB6AC" stroke-width="9" filter="url(#shadow)"/>
+  <circle cx="375" cy="368" r="9" fill="#4DB6AC"/>
 
   <!-- Deal badge — top right -->
-  <circle cx="406" cy="104" r="62" fill="url(#badge)" filter="url(#shadow)"/>
-  <!-- Star burst effect -->
-  <path d="M406,46 L412,82 L446,72 L422,96 L452,110 L416,112 L422,148 L406,120 L390,148 L396,112 L360,110 L390,96 L366,72 L400,82 Z" fill="rgba(255,255,255,0.18)"/>
-  <!-- % text -->
-  <text x="406" y="98" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,-apple-system,Roboto,sans-serif" font-size="48" font-weight="900" fill="#1A0A00" letter-spacing="-2">%</text>
-  <text x="406" y="132" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,-apple-system,Roboto,sans-serif" font-size="20" font-weight="800" fill="#2D1200">דיל</text>
+  <circle cx="408" cy="106" r="60" fill="url(#badge)" filter="url(#shadow)"/>
+  <path d="M408,50 L414,84 L446,74 L423,98 L452,112 L418,114 L423,148 L408,122 L393,148 L398,114 L364,112 L393,98 L370,74 L402,84 Z"
+        fill="rgba(255,255,255,0.18)"/>
+  <text x="408" y="100" text-anchor="middle" dominant-baseline="middle"
+        font-family="system-ui,-apple-system,sans-serif" font-size="46" font-weight="900" fill="#1A0900" letter-spacing="-2">%</text>
+  <text x="408" y="132" text-anchor="middle" dominant-baseline="middle"
+        font-family="system-ui,-apple-system,sans-serif" font-size="19" font-weight="800" fill="#2D1200">דיל</text>
 </svg>
