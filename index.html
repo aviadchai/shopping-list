@@ -144,6 +144,7 @@ header{display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:ca
 #cat-picker.open{display:flex;flex-direction:column;gap:2px;animation:toastIn 0.15s ease;}
 .cat-pick-item{background:none;border:none;color:var(--text);font-family:inherit;font-size:13px;padding:8px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;text-align:right;}
 .cat-pick-item:hover,.cat-pick-item.current{background:var(--accent-dim);color:var(--accent);}
+/* ── Shared mobile + desktop centered styles ── */
 @media(max-width:640px){
   .body{flex-direction:column;}
   #list-panel{width:100%;flex:1;border-left:none;border-bottom:none;}
@@ -168,18 +169,51 @@ header{display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:ca
     background:rgba(255,255,255,0.65);
     box-shadow:0 0 0 0.5px rgba(255,255,255,0.9),0 8px 36px rgba(0,0,0,0.08);
   }
-  #input-row:focus-within{
-    animation:blueGlow 2s ease-in-out infinite;
-  }
-  [data-theme=light] #input-row:focus-within{
-    animation:blueGlow 2s ease-in-out infinite;
-  }
+  #input-row:focus-within{animation:blueGlow 2s ease-in-out infinite;}
+  [data-theme=light] #input-row:focus-within{animation:blueGlow 2s ease-in-out infinite;}
   #input-wrap{background:transparent;border-color:transparent;padding:8px 6px;}
   .btn-circle{width:44px;height:44px;font-size:20px;border:none;background:none;}
   #send-btn{height:44px;width:44px;}
   .chk{width:26px;height:26px;}
   .item{padding:14px 16px;min-height:52px;}
   .del-btn{opacity:1;color:var(--muted);font-size:20px;padding:4px 8px;}
+  .item-name{font-size:15px;}
+  .cat-label{padding:8px 16px;}
+}
+/* ── Desktop: centered single-column layout ── */
+@media(min-width:641px){
+  .body{flex-direction:column;align-items:center;}
+  #list-panel{width:100%;max-width:640px;border-left:none;border-bottom:none;flex:1;}
+  #items-scroll{padding-bottom:88px;}
+  #messages,#typing,#hints{display:none;}
+  #chat-panel{
+    position:fixed;
+    left:50%;transform:translateX(-50%);
+    width:min(640px, calc(100% - 28px));
+    bottom:16px;
+    z-index:100;background:transparent;padding:0;
+    display:flex;flex-direction:column;
+  }
+  #input-row{
+    margin:0;padding:7px 7px 7px 12px;
+    border-top:none;border-radius:30px;
+    background:rgba(255,255,255,0.18);
+    backdrop-filter:blur(48px) saturate(2) brightness(1.08);
+    -webkit-backdrop-filter:blur(48px) saturate(2) brightness(1.08);
+    box-shadow:0 0 0 1px rgba(255,255,255,0.32),0 12px 48px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.4);
+    align-items:center;
+  }
+  [data-theme=light] #input-row{
+    background:rgba(255,255,255,0.65);
+    box-shadow:0 0 0 0.5px rgba(255,255,255,0.9),0 8px 36px rgba(0,0,0,0.08);
+  }
+  #input-row:focus-within{animation:blueGlow 2s ease-in-out infinite;}
+  [data-theme=light] #input-row:focus-within{animation:blueGlow 2s ease-in-out infinite;}
+  #input-wrap{background:transparent;border-color:transparent;padding:8px 6px;}
+  .btn-circle{width:44px;height:44px;font-size:20px;border:none;background:none;}
+  #send-btn{height:44px;width:44px;}
+  .item{padding:14px 16px;min-height:52px;}
+  .del-btn{opacity:1;color:var(--muted);}
   .item-name{font-size:15px;}
   .cat-label{padding:8px 16px;}
 }
@@ -450,7 +484,7 @@ function render() {
               <span class="item-name ${it.done?'done':''}">${esc(it.name)}</span>
               ${it.note ? `<span class="item-note">· ${esc(it.note)}</span>` : ''}
             </div>
-            <button class="cat-chip" onclick="openCatPicker('${it.id}',this,event)">${CAT_ICONS[it.category||'אחר']||CAT_ICONS['אחר']}</button>
+            <button class="cat-chip" onclick="openCatPicker('${it.id}',this,event)" title="שנה קטגוריה"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--border2)"><polyline points="6 9 12 15 18 9"/></svg></button>
             ${qtyHtml}
             ${(it.fun_fact||it.health_note) ? `<button class="info-btn${it.health?' active':''}" onclick="showInfoPopup('${it.id}',this)" title="מידע">i</button>` : ''}
             <button class="del-btn" onclick="delItem('${it.id}')">×</button>

@@ -4,123 +4,113 @@
       <stop offset="0%" stop-color="#0D2420"/>
       <stop offset="100%" stop-color="#163832"/>
     </linearGradient>
-    <linearGradient id="cart-fill" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#4DB6AC"/>
       <stop offset="100%" stop-color="#00897B"/>
     </linearGradient>
-    <linearGradient id="badge" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#FFD740"/>
       <stop offset="100%" stop-color="#FF9800"/>
     </linearGradient>
-    <filter id="shadow">
-      <feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#000" flood-opacity="0.45"/>
-    </filter>
-    <filter id="glow">
-      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#4DB6AC" flood-opacity="0.55"/>
-    </filter>
-    <filter id="dept-shadow">
-      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000" flood-opacity="0.4"/>
-    </filter>
-    <clipPath id="cart-clip">
-      <path d="M 158,158 L 435,158 L 405,318 L 188,318 Z"/>
-    </clipPath>
   </defs>
 
   <!-- Background -->
   <rect width="512" height="512" rx="108" fill="url(#bg)"/>
 
-  <!-- Subtle grid -->
-  <line x1="0" y1="170" x2="512" y2="170" stroke="rgba(77,182,172,0.05)" stroke-width="1"/>
-  <line x1="0" y1="340" x2="512" y2="340" stroke="rgba(77,182,172,0.05)" stroke-width="1"/>
-  <line x1="170" y1="0" x2="170" y2="512" stroke="rgba(77,182,172,0.05)" stroke-width="1"/>
-  <line x1="340" y1="0" x2="340" y2="512" stroke="rgba(77,182,172,0.05)" stroke-width="1"/>
-
   <!-- Cart handle -->
-  <path d="M 76,88 Q 76,60 104,60 L 152,60" stroke="url(#cart-fill)" stroke-width="22" stroke-linecap="round" fill="none" filter="url(#glow)"/>
-  <line x1="152" y1="60" x2="166" y2="158" stroke="url(#cart-fill)" stroke-width="22" stroke-linecap="round" filter="url(#glow)"/>
+  <polyline points="80,86 80,58 156,58" stroke="url(#cg)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <line x1="156" y1="58" x2="172" y2="158" stroke="url(#cg)" stroke-width="22" stroke-linecap="round"/>
 
   <!-- Cart body -->
-  <path d="M 158,158 L 435,158 L 405,318 L 188,318 Z" fill="url(#cart-fill)" filter="url(#shadow)"/>
+  <path d="M 164,158 L 432,158 L 402,318 L 194,318 Z" fill="url(#cg)"/>
 
-  <!-- Inner dividers -->
-  <line x1="258" y1="160" x2="246" y2="316" stroke="rgba(0,40,35,0.28)" stroke-width="2"/>
-  <line x1="336" y1="160" x2="324" y2="316" stroke="rgba(0,40,35,0.28)" stroke-width="2"/>
-  <line x1="160" y1="238" x2="432" y2="238" stroke="rgba(0,40,35,0.28)" stroke-width="2.5"/>
+  <!-- Divider lines on cart -->
+  <line x1="260" y1="159" x2="248" y2="317" stroke="rgba(0,45,38,0.3)" stroke-width="2.5"/>
+  <line x1="338" y1="159" x2="326" y2="317" stroke="rgba(0,45,38,0.3)" stroke-width="2.5"/>
+  <line x1="165" y1="239" x2="430" y2="239" stroke="rgba(0,45,38,0.3)" stroke-width="3"/>
 
-  <!-- ═══════ ROW 1: 3 department circles ═══════ -->
+  <!-- ── ROW 1 (y≈202) ── -->
 
-  <!-- 1. ירקות (Produce) — green -->
-  <circle cx="210" cy="200" r="33" fill="#43A047" filter="url(#dept-shadow)" clip-path="url(#cart-clip)"/>
-  <!-- Carrot: tapered body + leaf sprigs -->
-  <path d="M 210,214 Q 204,194 205,186 Q 210,182 215,186 Q 216,194 210,214 Z"
-        fill="rgba(255,255,255,0.92)"/>
-  <path d="M 210,188 Q 204,182 203,176" stroke="rgba(255,255,255,0.9)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-  <path d="M 210,187 Q 210,180 210,174" stroke="rgba(255,255,255,0.9)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-  <path d="M 210,188 Q 216,182 217,176" stroke="rgba(255,255,255,0.9)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <!-- 1. ירקות (green) -->
+  <circle cx="212" cy="202" r="33" fill="#388E3C"/>
+  <g transform="translate(212,202)" fill="white" stroke="white" stroke-linecap="round">
+    <!-- Carrot body -->
+    <path d="M -7,-9 L 0,14 L 7,-9 Z" stroke="none" opacity="0.9"/>
+    <!-- Leaves -->
+    <line x1="0" y1="-9" x2="-6" y2="-19" stroke-width="2.2" fill="none"/>
+    <line x1="0" y1="-9" x2="0" y2="-19" stroke-width="2.2" fill="none"/>
+    <line x1="0" y1="-9" x2="6" y2="-19" stroke-width="2.2" fill="none"/>
+  </g>
 
-  <!-- 2. פירות (Fruit) — red -->
-  <circle cx="291" cy="200" r="33" fill="#E53935" filter="url(#dept-shadow)" clip-path="url(#cart-clip)"/>
-  <!-- Apple: body + stem + small leaf -->
-  <path d="M 284,198 Q 283,187 291,186 Q 299,187 298,198 Q 297,210 291,212 Q 285,210 284,198 Z"
-        fill="rgba(255,255,255,0.92)"/>
-  <path d="M 291,187 Q 292,181 295,179" stroke="rgba(255,255,255,0.9)" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <path d="M 293,182 Q 297,180 298,183" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-  <!-- Apple divot at top -->
-  <path d="M 288,188 Q 291,187 294,188" stroke="rgba(229,57,53,0.5)" stroke-width="1.5" fill="none"/>
+  <!-- 2. פירות (red) -->
+  <circle cx="292" cy="202" r="33" fill="#C62828"/>
+  <g transform="translate(292,202)" fill="white" stroke="white" stroke-linecap="round">
+    <!-- Apple body -->
+    <ellipse cx="0" cy="4" rx="9" ry="11" stroke="none" opacity="0.9"/>
+    <!-- Apple top notch -->
+    <path d="M -3,-7 Q 0,-6 3,-7" stroke="#C62828" stroke-width="2" fill="none"/>
+    <!-- Stem -->
+    <line x1="0" y1="-7" x2="2" y2="-15" stroke-width="2.2" fill="none"/>
+  </g>
 
-  <!-- 3. חלב (Dairy) — light blue -->
-  <circle cx="370" cy="200" r="31" fill="#0288D1" filter="url(#dept-shadow)" clip-path="url(#cart-clip)"/>
-  <!-- Milk bottle: cap + neck + body -->
-  <path d="M 366,182 Q 366,178 370,178 Q 374,178 374,182 L 374,185 L 366,185 Z"
-        fill="rgba(255,255,255,0.92)"/>
-  <path d="M 366,185 L 364,188 L 376,188 L 374,185 Z" fill="rgba(255,255,255,0.85)"/>
-  <path d="M 364,188 Q 362,189 362,202 Q 362,214 370,214 Q 378,214 378,202 Q 378,189 376,188 Z"
-        fill="rgba(255,255,255,0.92)"/>
-  <!-- Liquid line inside bottle -->
-  <path d="M 363,204 Q 370,207 377,204" stroke="#0288D1" stroke-width="1.5" fill="none"/>
+  <!-- 3. חלב (blue) -->
+  <circle cx="370" cy="202" r="31" fill="#0277BD"/>
+  <g transform="translate(370,202)">
+    <!-- Milk bottle cap -->
+    <rect x="-4" y="-16" width="8" height="5" rx="2" fill="white" opacity="0.9"/>
+    <!-- Neck -->
+    <path d="M -4,-11 L -6,-6 L 6,-6 L 4,-11 Z" fill="white" opacity="0.85"/>
+    <!-- Body -->
+    <path d="M -6,-6 Q -11,-4 -11,7 Q -11,14 0,14 Q 11,14 11,7 Q 11,-4 6,-6 Z" fill="white" opacity="0.9"/>
+    <!-- Milk level line -->
+    <line x1="-10" y1="5" x2="10" y2="5" stroke="#0277BD" stroke-width="2" stroke-linecap="round"/>
+  </g>
 
-  <!-- ═══════ ROW 2: 3 department circles ═══════ -->
+  <!-- ── ROW 2 (y≈278) ── -->
 
-  <!-- 4. בשר (Meat) — deep orange -->
-  <circle cx="217" cy="278" r="29" fill="#D84315" filter="url(#dept-shadow)" clip-path="url(#cart-clip)"/>
-  <!-- Drumstick: meat oval + bone stick + knob -->
-  <ellipse cx="220" cy="284" rx="8" ry="10" fill="rgba(255,255,255,0.92)"/>
-  <line x1="215" y1="278" x2="206" y2="266" stroke="rgba(255,255,255,0.92)" stroke-width="4" stroke-linecap="round"/>
-  <circle cx="206" cy="265" r="5" fill="rgba(255,255,255,0.92)"/>
+  <!-- 4. בשר (deep orange) -->
+  <circle cx="217" cy="278" r="29" fill="#BF360C"/>
+  <g transform="translate(217,278)">
+    <!-- Drumstick meat -->
+    <ellipse cx="5" cy="7" rx="8" ry="10" fill="white" opacity="0.9"/>
+    <!-- Bone -->
+    <line x1="1" y1="0" x2="-8" y2="-12" stroke="white" stroke-width="5" stroke-linecap="round"/>
+    <!-- Bone knob -->
+    <circle cx="-8" cy="-12" r="5" fill="white" opacity="0.9"/>
+  </g>
 
-  <!-- 5. שתייה (Beverages) — teal/cyan -->
-  <circle cx="294" cy="278" r="29" fill="#00838F" filter="url(#dept-shadow)" clip-path="url(#cart-clip)"/>
-  <!-- Water drop -->
-  <path d="M 294,263 Q 304,272 304,279 Q 304,287 294,288 Q 284,287 284,279 Q 284,272 294,263 Z"
-        fill="rgba(255,255,255,0.92)"/>
-  <!-- Highlight inside drop -->
-  <path d="M 288,276 Q 287,272 290,270" stroke="rgba(0,131,143,0.6)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <!-- 5. שתייה (teal-cyan) -->
+  <circle cx="293" cy="278" r="29" fill="#006064"/>
+  <g transform="translate(293,278)">
+    <!-- Water drop -->
+    <path d="M 0,-14 Q 11,-3 11,5 Q 11,14 0,14 Q -11,14 -11,5 Q -11,-3 0,-14 Z" fill="white" opacity="0.9"/>
+    <!-- Highlight -->
+    <path d="M -6,2 Q -4,-2 -2,-2" stroke="#006064" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </g>
 
-  <!-- 6. מאפייה (Bakery) — amber -->
-  <circle cx="367" cy="278" r="27" fill="#FF8F00" filter="url(#dept-shadow)" clip-path="url(#cart-clip)"/>
-  <!-- Bread loaf: rounded rectangle + score lines -->
-  <path d="M 359,275 Q 359,266 367,265 Q 375,266 375,275 L 375,283 Q 375,287 367,287 Q 359,287 359,283 Z"
-        fill="rgba(255,255,255,0.92)"/>
-  <!-- Score marks on bread -->
-  <path d="M 363,267 Q 363,285 363,285" stroke="#FF8F00" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-  <path d="M 367,266 Q 367,285 367,285" stroke="#FF8F00" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-  <path d="M 371,267 Q 371,285 371,285" stroke="#FF8F00" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+  <!-- 6. מאפייה (amber) -->
+  <circle cx="366" cy="278" r="27" fill="#E65100"/>
+  <g transform="translate(366,278)">
+    <!-- Bread loaf -->
+    <path d="M -9,3 Q -9,-11 0,-12 Q 9,-11 9,3 L 9,8 Q 9,12 0,12 Q -9,12 -9,8 Z" fill="white" opacity="0.9"/>
+    <!-- Score marks -->
+    <line x1="-3" y1="-8" x2="-3" y2="8" stroke="#E65100" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="3" y1="-8" x2="3" y2="8" stroke="#E65100" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
 
-  <!-- Cart bottom bar -->
-  <rect x="188" y="308" width="217" height="16" rx="8" fill="#004D40"/>
+  <!-- Cart bottom rail -->
+  <rect x="194" y="309" width="208" height="16" rx="8" fill="#004D40"/>
 
   <!-- Wheels -->
-  <circle cx="232" cy="368" r="32" fill="#1A4A44" stroke="#4DB6AC" stroke-width="9" filter="url(#shadow)"/>
-  <circle cx="232" cy="368" r="9" fill="#4DB6AC"/>
-  <circle cx="375" cy="368" r="32" fill="#1A4A44" stroke="#4DB6AC" stroke-width="9" filter="url(#shadow)"/>
+  <circle cx="234" cy="368" r="31" fill="#1A4A44" stroke="#4DB6AC" stroke-width="9"/>
+  <circle cx="234" cy="368" r="9" fill="#4DB6AC"/>
+  <circle cx="375" cy="368" r="31" fill="#1A4A44" stroke="#4DB6AC" stroke-width="9"/>
   <circle cx="375" cy="368" r="9" fill="#4DB6AC"/>
 
-  <!-- Deal badge — top right -->
-  <circle cx="408" cy="106" r="60" fill="url(#badge)" filter="url(#shadow)"/>
-  <path d="M408,50 L414,84 L446,74 L423,98 L452,112 L418,114 L423,148 L408,122 L393,148 L398,114 L364,112 L393,98 L370,74 L402,84 Z"
-        fill="rgba(255,255,255,0.18)"/>
+  <!-- Deal badge -->
+  <circle cx="408" cy="106" r="60" fill="url(#bg2)"/>
   <text x="408" y="100" text-anchor="middle" dominant-baseline="middle"
-        font-family="system-ui,-apple-system,sans-serif" font-size="46" font-weight="900" fill="#1A0900" letter-spacing="-2">%</text>
-  <text x="408" y="132" text-anchor="middle" dominant-baseline="middle"
-        font-family="system-ui,-apple-system,sans-serif" font-size="19" font-weight="800" fill="#2D1200">דיל</text>
+        font-family="Arial,Helvetica,sans-serif" font-size="50" font-weight="900" fill="#1A0900">%</text>
+  <text x="408" y="133" text-anchor="middle" dominant-baseline="middle"
+        font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="800" fill="#2D1200">דיל</text>
 </svg>
