@@ -418,7 +418,40 @@ const CAT_ICONS = {
   'קפואים':       mkIcon('<line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M5 5l14 14M19 5L5 19"/>', '#818cf8'),
   'ממתקים וחטיפים': mkIcon('<circle cx="12" cy="9" r="6"/><line x1="12" y1="15" x2="12" y2="22"/>', '#f472b6'),
   'אחר':          mkIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', '#94a3b8'),
+  // aliases — AI sometimes returns shorter names
+  'ירקות':        null,'פירות':null,
+  'חלב':          null,'ביצים':null,
+  'בשר':          null,'דגים':null,'עוף':null,
+  'ממתקים':       null,'חטיפים':null,
+  'שימורים':      null,'יבשים':null,
+  'ניקיון':       null,
+  'קפוא':         null,
+  'לחם':          null,'מאפים':null,
+  'שתייה':        null,
 };
+// fill aliases
+const _a = CAT_ICONS;
+_a['ירקות'] = _a['פירות'] = _a['ירקות ופירות'];
+_a['חלב'] = _a['ביצים'] = _a['חלב וביצים'];
+_a['בשר'] = _a['דגים'] = _a['עוף'] = _a['בשר ודגים'];
+_a['ממתקים'] = _a['חטיפים'] = _a['ממתקים וחטיפים'];
+_a['שימורים'] = _a['יבשים'] = _a['שימורים ויבשים'];
+_a['ניקיון'] = _a['מוצרי ניקיון'];
+_a['קפוא'] = _a['קפואים'];
+_a['לחם'] = _a['מאפים'] = _a['מאפייה'];
+_a['שתייה'] = _a['משקאות'];
+
+function getCatIcon(cat) {
+  if (!cat) return CAT_ICONS['אחר'];
+  if (CAT_ICONS[cat]) return CAT_ICONS[cat];
+  // partial fuzzy: check first 3 chars of each known key
+  const c = cat.trim();
+  for (const key of Object.keys(CAT_ICONS)) {
+    if (key === 'אחר' || !CAT_ICONS[key]) continue;
+    if (c.includes(key.split(' ')[0]) || key.includes(c)) return CAT_ICONS[key];
+  }
+  return CAT_ICONS['אחר'];
+}
 
 function render() {
   const scroll = document.getElementById('items-scroll');
@@ -455,7 +488,7 @@ function render() {
   if (pctEl) pctEl.textContent = totalAll ? `${doneAll}/${totalAll}` : '';
 
   scroll.innerHTML = catOrder.map(cat => {
-    const icon = CAT_ICONS[cat] || CAT_ICONS['אחר'];
+    const icon = getCatIcon(cat);
     const catItems = byCat[cat];
     const collapsed = collapsedCats.has(cat);
     const doneCount = catItems.filter(i => i.done).length;
